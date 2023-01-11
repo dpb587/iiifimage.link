@@ -1,9 +1,7 @@
 class ParsedUrl {
-  Service
-  InfoJson
-  ImageRequest
+  Service;
+  InfoJson;
+  ImageRequest;
 }
 
-function parseUrl(input) {
-
-}
+function parseUrl(input) {}

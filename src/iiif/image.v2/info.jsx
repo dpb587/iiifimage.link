@@ -1,38 +1,48 @@
-import { InfoDescriptor, resolveFeatureSet } from "../image/info"
-import { builtinFeatures, builtinFormats, builtinQualities, complianceNameLevel0, complianceNameLevel1, complianceNameLevel2, complianceSpecUrl, serviceName, serviceSpecUrl } from "./builtins"
+import { InfoDescriptor, resolveFeatureSet } from "../image/info";
+import {
+  builtinFeatures,
+  builtinFormats,
+  builtinQualities,
+  complianceNameLevel0,
+  complianceNameLevel1,
+  complianceNameLevel2,
+  complianceSpecUrl,
+  serviceName,
+  serviceSpecUrl,
+} from "./builtins";
 
 function ParseInfo({ httpUrl, httpBodyJson }) {
   if (!httpBodyJson) {
-    return undefined
-  } else if (httpBodyJson['protocol'] != 'http://iiif.io/api/image') {
-    return undefined
-  } else if (!httpBodyJson['@context']) {
-    return undefined
-  } else if (!httpBodyJson['@id']) {
-    return undefined
-  } else if (httpBodyJson['@type'] && httpBodyJson['@type'] != 'iiif:Image') {
-    return undefined
+    return undefined;
+  } else if (httpBodyJson["protocol"] != "http://iiif.io/api/image") {
+    return undefined;
+  } else if (!httpBodyJson["@context"]) {
+    return undefined;
+  } else if (!httpBodyJson["@id"]) {
+    return undefined;
+  } else if (httpBodyJson["@type"] && httpBodyJson["@type"] != "iiif:Image") {
+    return undefined;
   }
 
-  let isV2 = false
+  let isV2 = false;
 
-  for (const v of Array.isArray(httpBodyJson['@context']) ? httpBodyJson['@context'] : [httpBodyJson['@context']]) {
-    if (v == 'http://iiif.io/api/image/2/context.json') {
-      isV2 = true
+  for (const v of Array.isArray(httpBodyJson["@context"]) ? httpBodyJson["@context"] : [httpBodyJson["@context"]]) {
+    if (v == "http://iiif.io/api/image/2/context.json") {
+      isV2 = true;
 
-      break
+      break;
     }
   }
 
   if (!isV2) {
-    return undefined
+    return undefined;
   }
 
-  const id = new InfoDescriptor()
-  id.rootId = new URL(httpBodyJson['@id'], httpUrl).toString()
-  id.rootServiceName = serviceName
-  id.rootServiceSpecUrl = serviceSpecUrl
-  id.rootComplianceSpecUrl = complianceSpecUrl
+  const id = new InfoDescriptor();
+  id.rootId = new URL(httpBodyJson["@id"], httpUrl).toString();
+  id.rootServiceName = serviceName;
+  id.rootServiceSpecUrl = serviceSpecUrl;
+  id.rootComplianceSpecUrl = complianceSpecUrl;
 
   let protoCompliance = null;
   const aggregateFormats = [];
@@ -40,191 +50,203 @@ function ParseInfo({ httpUrl, httpBodyJson }) {
   const aggregateSupports = [];
 
   // ambiguous in spec and wild; .maxWidth (e.g. bodleian) vs .profile[].maxWidth
-  let knownMaxWidth = httpBodyJson['maxWidth']
-  let knownMaxHeight = httpBodyJson['maxHeight']
-  let knownMaxArea = httpBodyJson['maxArea']
+  let knownMaxWidth = httpBodyJson["maxWidth"];
+  let knownMaxHeight = httpBodyJson["maxHeight"];
+  let knownMaxArea = httpBodyJson["maxArea"];
 
-  for (const k in httpBodyJson['profile']) {
-    const v = httpBodyJson['profile'][k];
+  for (const k in httpBodyJson["profile"]) {
+    const v = httpBodyJson["profile"][k];
 
     if (k == 0) {
       // The first entry in the list must be a compliance level URI.
       switch (v) {
-      case 'http://iiif.io/api/image/2/level0':
-      case 'http://iiif.io/api/image/2/level0.json':
-        id.rootComplianceName = complianceNameLevel0
-        protoCompliance = 'level0'
-        break
-      case 'http://iiif.io/api/image/2/level1':
-      case 'http://iiif.io/api/image/2/level1.json':
-        id.rootComplianceName = complianceNameLevel1
-        protoCompliance = 'level1'
-        break
-      case 'http://iiif.io/api/image/2/level2':
-      case 'http://iiif.io/api/image/2/level2.json':
-        id.rootComplianceName = complianceNameLevel2
-        protoCompliance = 'level2'
-        break
-      default:
-        return undefined
+        case "http://iiif.io/api/image/2/level0":
+        case "http://iiif.io/api/image/2/level0.json":
+          id.rootComplianceName = complianceNameLevel0;
+          protoCompliance = "level0";
+          break;
+        case "http://iiif.io/api/image/2/level1":
+        case "http://iiif.io/api/image/2/level1.json":
+          id.rootComplianceName = complianceNameLevel1;
+          protoCompliance = "level1";
+          break;
+        case "http://iiif.io/api/image/2/level2":
+        case "http://iiif.io/api/image/2/level2.json":
+          id.rootComplianceName = complianceNameLevel2;
+          protoCompliance = "level2";
+          break;
+        default:
+          return undefined;
       }
 
-      continue
-    } else if (
-      typeof v === 'object' &&
-      !Array.isArray(v) &&
-      v !== null
-    ) {
-      if (v['@type'] && v['@type'] != 'iiif:ImageProfile') {
-        continue
+      continue;
+    } else if (typeof v === "object" && !Array.isArray(v) && v !== null) {
+      if (v["@type"] && v["@type"] != "iiif:ImageProfile") {
+        continue;
       }
 
-      if (v['formats']) {
-        aggregateFormats.push(...v['formats'])
+      if (v["formats"]) {
+        aggregateFormats.push(...v["formats"]);
       }
 
-      if (v['qualities']) {
-        aggregateQualities.push(...v['qualities'])
+      if (v["qualities"]) {
+        aggregateQualities.push(...v["qualities"]);
       }
 
-      if (v['supports']) {
-        aggregateSupports.push(...v['supports'])
+      if (v["supports"]) {
+        aggregateSupports.push(...v["supports"]);
       }
 
-      if (v['maxWidth']) {
-        knownMaxWidth = v['maxWidth']
+      if (v["maxWidth"]) {
+        knownMaxWidth = v["maxWidth"];
       }
 
-      if (v['maxHeight']) {
-        knownMaxHeight = v['maxHeight']
+      if (v["maxHeight"]) {
+        knownMaxHeight = v["maxHeight"];
       }
 
-      if (v['maxArea']) {
-        knownMaxArea = v['maxArea']
+      if (v["maxArea"]) {
+        knownMaxArea = v["maxArea"];
       }
     }
   }
 
-  id.rootFeatures = resolveFeatureSet(builtinFeatures, protoCompliance, aggregateSupports)
-  
+  id.rootFeatures = resolveFeatureSet(builtinFeatures, protoCompliance, aggregateSupports);
+
   for (const feature of id.rootFeatures) {
     switch (feature.name) {
-    case 'sizeAboveFull':
-      // TODO
-      break
-    case 'sizeByDistortedWh':
-      // TODO now explicit in v3
-      break
-    case 'sizeByWhListed':
-      // TODO deprecated in v2
-      break
-    case 'sizeByForcedWh':
-      // TODO deprecated in v2
-      break
-    case 'mirroring':
-    case 'regionByPct':
-    case 'regionByPx':
-    case 'regionSquare':
-    case 'rotationArbitrary':
-    case 'rotationBy90s':
-    case 'sizeByConfinedWh':
-    case 'sizeByH':
-    case 'sizeByPct':
-    case 'sizeByW':
-    case 'sizeByWh':
-      id.uiFeatureFlags[feature.name] = true
-      break
+      case "sizeAboveFull":
+        // TODO
+        break;
+      case "sizeByDistortedWh":
+        // TODO now explicit in v3
+        break;
+      case "sizeByWhListed":
+        // TODO deprecated in v2
+        break;
+      case "sizeByForcedWh":
+        // TODO deprecated in v2
+        break;
+      case "mirroring":
+      case "regionByPct":
+      case "regionByPx":
+      case "regionSquare":
+      case "rotationArbitrary":
+      case "rotationBy90s":
+      case "sizeByConfinedWh":
+      case "sizeByH":
+      case "sizeByPct":
+      case "sizeByW":
+      case "sizeByWh":
+        id.uiFeatureFlags[feature.name] = true;
+        break;
     }
   }
 
-  id.uiQualities = resolveFeatureSet(builtinQualities, protoCompliance, aggregateQualities).filter(v => v.supported).map(v => v.name)
-  id.uiFormats = resolveFeatureSet(builtinFormats, protoCompliance, aggregateFormats).filter(v => v.supported).map(v => v.name)
+  id.uiQualities = resolveFeatureSet(builtinQualities, protoCompliance, aggregateQualities)
+    .filter((v) => v.supported)
+    .map((v) => v.name);
+  id.uiFormats = resolveFeatureSet(builtinFormats, protoCompliance, aggregateFormats)
+    .filter((v) => v.supported)
+    .map((v) => v.name);
 
-  if (httpBodyJson['attribution']) {
+  if (httpBodyJson["attribution"]) {
     // untested
     id.uiTerms.push(
-      ...(Array.isArray(httpBodyJson['attribution']) ? httpBodyJson['attribution'] : [httpBodyJson['attribution']]).map(v => (
-        {
-          label: 'Attribution',
-          value: <span dangerouslySetInnerHTML={v['@value']} />,
-        }
-      )),
-    )
+      ...(Array.isArray(httpBodyJson["attribution"]) ? httpBodyJson["attribution"] : [httpBodyJson["attribution"]]).map(
+        (v) => ({
+          label: "Attribution",
+          value: <span dangerouslySetInnerHTML={v["@value"]} />,
+        })
+      )
+    );
   }
 
-  if (httpBodyJson['license']) {
+  if (httpBodyJson["license"]) {
     id.uiTerms.push(
-      ...(Array.isArray(httpBodyJson['license']) ? httpBodyJson['license'] : [httpBodyJson['license']]).map(v => (
-        {
-          label: 'License',
-          value: <a className="underline" href={v} target="_blank">{v}</a>,
-        }
-      )),
-    )
+      ...(Array.isArray(httpBodyJson["license"]) ? httpBodyJson["license"] : [httpBodyJson["license"]]).map((v) => ({
+        label: "License",
+        value: (
+          <a className="underline" href={v} target="_blank">
+            {v}
+          </a>
+        ),
+      }))
+    );
   }
 
-  id.uiImageWidth = httpBodyJson['width']
-  id.uiImageHeight = httpBodyJson['height']
+  id.uiImageWidth = httpBodyJson["width"];
+  id.uiImageHeight = httpBodyJson["height"];
   id.uiTerms.push({
-    label: 'Full Size',
-    value: <span>{id.uiImageWidth}&times;{id.uiImageHeight}</span>,
-  })
+    label: "Full Size",
+    value: (
+      <span>
+        {id.uiImageWidth}&times;{id.uiImageHeight}
+      </span>
+    ),
+  });
 
-  id.uiThumbnailWidth = 512
-  id.uiThumbnailHeight = Math.round(512 / id.uiImageWidth * id.uiImageHeight)
-  id.uiThumbnailUrl = `${id.rootId}/full/${id.uiThumbnailWidth},${id.uiThumbnailHeight}/0/default.jpg`
+  id.uiThumbnailWidth = 512;
+  id.uiThumbnailHeight = Math.round((512 / id.uiImageWidth) * id.uiImageHeight);
+  id.uiThumbnailUrl = `${id.rootId}/full/${id.uiThumbnailWidth},${id.uiThumbnailHeight}/0/default.jpg`;
 
-  if (httpBodyJson['sizes']) {
-    let seekingThumbnail = true
+  if (httpBodyJson["sizes"]) {
+    let seekingThumbnail = true;
 
-    for (const size of httpBodyJson['sizes']) {
+    for (const size of httpBodyJson["sizes"]) {
       id.uiSizesPreferred.push({
         width: size.width,
         height: size.height || size.width,
-      })
+      });
 
       if (seekingThumbnail && (size.width > 512 || size.height > 512)) {
-        seekingThumbnail = false
+        seekingThumbnail = false;
 
-        id.uiThumbnailUrl = `${id.rootId}/full/${size.width},${size.height}/0/default.jpg`
-        id.uiThumbnailHeight = size.height
-        id.uiThumbnailWidth = size.width
+        id.uiThumbnailUrl = `${id.rootId}/full/${size.width},${size.height}/0/default.jpg`;
+        id.uiThumbnailHeight = size.height;
+        id.uiThumbnailWidth = size.width;
       }
     }
   }
 
-  if (httpBodyJson['tiles']) {
-    id.uiTerms.push(...httpBodyJson['tiles'].map(tiles => ({
-      label: 'Tiles',
-      value: <span>{tiles.width}&times;{tiles.height || tiles.width} ({tiles.scaleFactors.join('/')})</span>,
-    })))
+  if (httpBodyJson["tiles"]) {
+    id.uiTerms.push(
+      ...httpBodyJson["tiles"].map((tiles) => ({
+        label: "Tiles",
+        value: (
+          <span>
+            {tiles.width}&times;{tiles.height || tiles.width} ({tiles.scaleFactors.join("/")})
+          </span>
+        ),
+      }))
+    );
   }
 
   if (knownMaxWidth) {
-    id.uiMaxWidth = knownMaxWidth
+    id.uiMaxWidth = knownMaxWidth;
     id.uiTerms.push({
-      label: 'Maximum',
+      label: "Maximum",
       value: `Width (${knownMaxWidth})`,
-    })
+    });
   }
 
   if (knownMaxHeight) {
-    id.uiMaxHeight = knownMaxHeight
+    id.uiMaxHeight = knownMaxHeight;
     id.uiTerms.push({
-      label: 'Maximum',
+      label: "Maximum",
       value: `Height (${knownMaxHeight})`,
-    })
+    });
   }
 
   if (knownMaxArea) {
-    id.uiMaxArea = knownMaxArea
+    id.uiMaxArea = knownMaxArea;
     id.uiTerms.push({
-      label: 'Maximum',
+      label: "Maximum",
       value: `Area (${knownMaxArea})`,
-    })
+    });
   }
 
-  return id
+  return id;
 }
 
-export { ParseInfo }
+export { ParseInfo };
