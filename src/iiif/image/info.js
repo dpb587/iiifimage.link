@@ -1,6 +1,9 @@
 class InfoResponse {
-  httpUrl;
+  httpUrl; // requestUrl
+  requestHeaders = [];
+
   httpStatus;
+  httpStatusText;
   httpDuration;
   httpHeaders;
   httpBody;
@@ -24,6 +27,9 @@ class InfoDescriptor {
   uiThumbnailUrl;
   uiThumbnailHeight;
   uiThumbnailWidth;
+  uiMaxWidth;
+  uiMaxHeight;
+  uiMaxArea;
 
   uiTerms = [];
   uiFeatureFlags = {};

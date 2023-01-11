@@ -39,6 +39,11 @@ function ParseInfo({ httpUrl, httpBodyJson }) {
   const aggregateQualities = [];
   const aggregateSupports = [];
 
+  // ambiguous in spec and wild; .maxWidth (e.g. bodleian) vs .profile[].maxWidth
+  let knownMaxWidth = httpBodyJson['maxWidth']
+  let knownMaxHeight = httpBodyJson['maxHeight']
+  let knownMaxArea = httpBodyJson['maxArea']
+
   for (const k in httpBodyJson['profile']) {
     const v = httpBodyJson['profile'][k];
 
@@ -85,14 +90,55 @@ function ParseInfo({ httpUrl, httpBodyJson }) {
       if (v['supports']) {
         aggregateSupports.push(...v['supports'])
       }
+
+      if (v['maxWidth']) {
+        knownMaxWidth = v['maxWidth']
+      }
+
+      if (v['maxHeight']) {
+        knownMaxHeight = v['maxHeight']
+      }
+
+      if (v['maxArea']) {
+        knownMaxArea = v['maxArea']
+      }
     }
   }
 
   id.rootFeatures = resolveFeatureSet(builtinFeatures, protoCompliance, aggregateSupports)
+  
+  for (const feature of id.rootFeatures) {
+    switch (feature.name) {
+    case 'sizeAboveFull':
+      // TODO
+      break
+    case 'sizeByDistortedWh':
+      // TODO now explicit in v3
+      break
+    case 'sizeByWhListed':
+      // TODO deprecated in v2
+      break
+    case 'sizeByForcedWh':
+      // TODO deprecated in v2
+      break
+    case 'mirroring':
+    case 'regionByPct':
+    case 'regionByPx':
+    case 'regionSquare':
+    case 'rotationArbitrary':
+    case 'rotationBy90s':
+    case 'sizeByConfinedWh':
+    case 'sizeByH':
+    case 'sizeByPct':
+    case 'sizeByW':
+    case 'sizeByWh':
+      id.uiFeatureFlags[feature.name] = true
+      break
+    }
+  }
 
-  id.uiFeatureFlags // TODO
-  id.uiQualities = resolveFeatureSet(builtinQualities, protoCompliance, aggregateQualities)
-  id.uiFormats = resolveFeatureSet(builtinFormats, protoCompliance, aggregateFormats)
+  id.uiQualities = resolveFeatureSet(builtinQualities, protoCompliance, aggregateQualities).filter(v => v.supported).map(v => v.name)
+  id.uiFormats = resolveFeatureSet(builtinFormats, protoCompliance, aggregateFormats).filter(v => v.supported).map(v => v.name)
 
   if (httpBodyJson['attribution']) {
     // untested
@@ -154,24 +200,27 @@ function ParseInfo({ httpUrl, httpBodyJson }) {
     })))
   }
 
-  if (httpBodyJson['maxWidth']) {
+  if (knownMaxWidth) {
+    id.uiMaxWidth = knownMaxWidth
     id.uiTerms.push({
       label: 'Maximum',
-      value: `Width (${httpBodyJson['maxWidth']})`,
+      value: `Width (${knownMaxWidth})`,
     })
   }
 
-  if (httpBodyJson['maxHeight']) {
+  if (knownMaxHeight) {
+    id.uiMaxHeight = knownMaxHeight
     id.uiTerms.push({
       label: 'Maximum',
-      value: `Height (${httpBodyJson['maxHeight']})`,
+      value: `Height (${knownMaxHeight})`,
     })
   }
 
-  if (httpBodyJson['maxArea']) {
+  if (knownMaxArea) {
+    id.uiMaxArea = knownMaxArea
     id.uiTerms.push({
       label: 'Maximum',
-      value: `Area (${httpBodyJson['maxArea']})`,
+      value: `Area (${knownMaxArea})`,
     })
   }
 

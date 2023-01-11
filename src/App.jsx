@@ -1,8 +1,9 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
-import { CheckIcon, ChevronRightIcon, CodeBracketIcon, CodeBracketSquareIcon, ExclamationCircleIcon, InformationCircleIcon, LifebuoyIcon, LinkIcon, PhotoIcon, SparklesIcon, XMarkIcon } from "@heroicons/react/20/solid"
+import { ArrowTopRightOnSquareIcon, CheckIcon, ChevronRightIcon, CodeBracketIcon, CodeBracketSquareIcon, ExclamationCircleIcon, InformationCircleIcon, LifebuoyIcon, LinkIcon, PhotoIcon, SparklesIcon, XMarkIcon } from "@heroicons/react/20/solid"
 import './App.css'
 import { fetchInfo } from './iiif/image/fetch'
 import clsx from 'clsx'
+import ImageRequestBuilder from './components/ImageRequestBuilder'
 
 function groupTerms(input) {
   return Object.values(
@@ -33,11 +34,7 @@ function App() {
 
   function reset(push) {
     if (push) {
-      try {
-        history.pushState("", document.title, window.location.pathname + window.location.search);
-      } catch (e) {
-        window.location.hash = ''
-      }
+      setLocation('')
     }
 
     setUrlInput('')
@@ -45,16 +42,20 @@ function App() {
     setInfoDescriptor(null)
   }
 
-  function setAndReload(url, push) {
-    setUrlInput(url)
-    reload(url, push)
-  }
-
-  function reload(url, push) {
-    if (push) {
+  function setLocation(url) {
+    if (url == '') {
+      try {
+        // avoids useless `#` remaining in the url
+        history.pushState("", document.title, window.location.pathname + window.location.search);
+      } catch (e) {
+        window.location.hash = ''
+      }
+    } else {
       window.location.hash = `#${encodeURIComponent(url)}`
     }
+  }
 
+  function reload(url) {
     fetchInfo(url).
       then(res => {
         setHttpResponse(res.http)
@@ -77,23 +78,36 @@ function App() {
       return reset(true)
     }
 
-    reload(urlInput, true)
+    setLocation(urlInput)
+  }
+
+  function doClick(e) {
+    if (urlInput != '' && urlInput == decodeURIComponent(window.location.hash.replace(/^#/, ''))) {
+      // allow explicit re-requests even if unchanged
+      reload(urlInput)
+
+      return
+    }
+    
+    doSubmit(e)
   }
 
   function showExample(e, target) {
     e.preventDefault()
-
-    setAndReload(target, true)
+    setLocation(target)
   }
 
   function hashchange() {
     const url = decodeURIComponent(window.location.hash.replace(/^#/, ''))
 
     if (url == '') {
-      return reset(false)
+      reset(false)
+
+      return
     }
 
-    setAndReload(url, false)
+    setUrlInput(url)
+    reload(url)
   }
 
   useEffect(() => {
@@ -108,7 +122,7 @@ function App() {
     <div className="max-w-3xl mx-auto">
       <header className="mb-4 mt-12 px-4 text-center">
         <h1 className="text-xl font-light">
-          <span className="font-medium">Inspect IIIF Image</span>
+          <span className="font-medium">IIIF Image Inspector</span>
         </h1>
       </header>
       <section className="my-4">
@@ -122,7 +136,7 @@ function App() {
                 type="url"
                 name="url"
                 className="block w-full rounded-md border-neutral-300 pl-9 pr-20 focus:border-neutral-500 focus:ring-neutral-500"
-                placeholder="Paste a link about an IIIF image&hellip;"
+                placeholder="Paste any link about an IIIF Image&hellip;"
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
               />
@@ -130,6 +144,7 @@ function App() {
                 <button
                   type="submit"
                   className="uppercase inline-flex items-center rounded-sm border border-transparent bg-neutral-100 px-2.5 py-1.5 text-xs font-medium text-neutral-800 hover:bg-neutral-200 active:bg-neutral-300 active:text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2"
+                  onClick={doClick}
                 >
                   Load
                 </button>
@@ -141,7 +156,7 @@ function App() {
       <main className="bg-white rounded-md shadow-md overflow-hidden">
         {!httpResponse && !infoDescriptor && (
           <section className="my-5">
-            <div className="flex space-x-3 px-4">
+            <div className="flex space-x-3 px-4 pb-0.5">
               <div className="relative px-2 pt-1.5 -mt-1 z-0">
                 <div className="bg-white shadow-sm border border-neutral-300 -m-px rounded-sm p-1 z-10">
                   <LifebuoyIcon className="text-neutral-500 w-4 h-4" />
@@ -150,14 +165,15 @@ function App() {
               </div>
               <div className="flex-1">
                 <div className="text-lg font-medium">Links may be an image service, info.json, or image file URL.</div>
-                <div className="mt-1.5 pt-0.5 text-neutral-700 leading-7">
-                  <p>This is just a small tool that shows the metadata of <a className="font-medium underline" href="https://iiif.io/">IIIF</a> images and how their image file URLs may be constructed. Here are a few examples images to get you started&hellip;</p>
-                  <ul className="list-disc mt-2 ml-5">
+                <div className="mt-1.5 pt-0.5 text-neutral-800 leading-7">
+                  <p>Hello! This is a small tool to inspect metadata about IIIF images and demonstrate how their image file URLs may be constructed. Here are a few examples to try it out&hellip;</p>
+                  <ul className="list-disc my-2.5 ml-8">
                     <li><a className="font-medium underline" href="https://images.collections.yale.edu/iiif/2/ycba:cef381c4-9716-45e9-ac19-c8ee64808170" onClick={(e) => showExample(e, 'https://images.collections.yale.edu/iiif/2/ycba:cef381c4-9716-45e9-ac19-c8ee64808170')}>Canvas of Cornfield at sunset</a> from <a className="underline" href="https://collections.britishart.yale.edu/catalog/tms:511" target="_blank">Yale Center for British Art</a></li>
                     <li><a className="font-medium underline" href="https://iiif.ucd.ie/loris/ivrla:434" onClick={(e) => showExample(e, 'https://iiif.ucd.ie/loris/ivrla:434')}>Map of the City of Dublin</a> from <a className="underline" href="https://digital.ucd.ie/view/ivrla:431" target="_blank">UCD Digital Library</a></li>
                     <li><a className="font-medium underline" href="https://tile.loc.gov/image-services/iiif/service:music:musbaseball:musbaseball-100028:musbaseball-100028.0001" onClick={(e) => showExample(e, 'https://tile.loc.gov/image-services/iiif/service:music:musbaseball:musbaseball-100028:musbaseball-100028.0001')}>Music of Over the fence is out</a> from <a className="underline" href="https://www.loc.gov/resource/musbaseball.100028.0/" target="_blank">Library of Congress</a></li>
                     <li><a className="font-medium underline" href="https://iiif.bodleian.ox.ac.uk/iiif/image/b62bca5b-d064-4ce9-b668-40eb98edbe92" onClick={(e) => showExample(e, 'https://iiif.bodleian.ox.ac.uk/iiif/image/b62bca5b-d064-4ce9-b668-40eb98edbe92')}>Portrait of Margaret Beaufort</a> from <a className="underline" href="https://digital.bodleian.ox.ac.uk/objects/ab96d208-a553-45cc-b622-2c2210685119/" target="_blank">Bodleian Library</a></li>
                   </ul>
+                  <p>You can learn more about the IIIF APIs from <a className="font-medium underline" href="https://iiif.io/api/" target="_blank">iiif.io</a>. This tool supports <a className="font-medium underline" href="https://iiif.io/api/image/2.1/" target="_blank">Version 2</a> and <a className="font-medium underline" href="https://iiif.io/api/image/3.0/" target="_blank">Version 3</a> of the Image API, but authentication-related workflows are not currently supported.</p>
                 </div>
               </div>
             </div>
@@ -308,6 +324,7 @@ function App() {
                 </div>
               </section>
             )}
+            <ImageRequestBuilder infoDescriptor={infoDescriptor} />
           </div>
         )}
         {httpResponse && (
@@ -321,6 +338,8 @@ function App() {
             >
               <ChevronRightIcon className={clsx('h-4 w-4 transition-transform duration-100', uiFlags.showHttpResponse && 'rotate-90')} />
               <span className="ml-1">info.json</span>
+              <span className="mx-1">{' '}&middot;{' '}</span>
+              <span>{httpResponse.httpStatus}{httpResponse.httpStatusText && ` ${httpResponse.httpStatusText}`}</span>
               {httpResponse.httpDuration && (
                 <>
                   <span className="mx-1">{' '}&middot;{' '}</span>
@@ -329,27 +348,47 @@ function App() {
               )}
             </button>
             {uiFlags.showHttpResponse && (
-              <div className="bg-neutral-900 text-neutral-200 py-2">
-                <div className="px-4 relative text-neutral-400">
-                  <div className="absolute left-3 inset-y-0 w-0.5 bg-neutral-400 rounded-full" />
-                  {httpResponse.httpHeaders.map((nv, nvIdx) => (
-                    <div key={nvIdx} className="pl-2.5"><code>{nv[0]}: {nv[1]}</code></div>
-                  ))}
+              <div className="bg-neutral-900 text-neutral-200 py-2 font-mono text-sm whitespace-pre overflow-x-auto space-y-2">
+                <div className="px-2.5 flex text-neutral-400">
+                  GET{' '}<span className="font-bold"><a className="underline" href={httpResponse.httpUrl}>{httpResponse.httpUrl}</a></span>
                 </div>
+                {httpResponse.requestHeaders.length > 0 && (
+                  <div className="px-2.5 text-neutral-400">
+                    {httpResponse.requestHeaders.map((nv, nvIdx) => (
+                      <div key={nvIdx} className="flex space-x-2">
+                        <span>&gt;</span>
+                        <pre className="whitespace-pre-wrap"><code><span className="font-bold">{nv[0]}</span>: {nv[1]}</code></pre>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="px-2.5 flex text-neutral-400">
+                  HTTP{' '}<span className="font-bold">{httpResponse.httpStatus}{httpResponse.httpStatusText && ` ${httpResponse.httpStatusText}`}</span>
+                </div>
+                {httpResponse.httpHeaders.length > 0 && (
+                  <div className="px-2.5 relative text-neutral-400">
+                    {httpResponse.httpHeaders.map((nv, nvIdx) => (
+                      <div key={nvIdx} className="flex space-x-2">
+                        <span>&lt;</span>
+                        <pre className="whitespace-pre-wrap"><code><span className="font-bold">{nv[0]}</span>: {nv[1]}</code></pre>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 {httpResponse.httpBodyJson && (
-                  <pre className="p-2 overflow-x-auto"><code>{JSON.stringify(httpResponse.httpBodyJson, '\n', '\t')}</code></pre>
+                  <pre className="px-2.5"><code>{JSON.stringify(httpResponse.httpBodyJson, '\n', '\t')}</code></pre>
                 )}
               </div>
             )}
           </section>
         )}
       </main>
-      <footer className="text-center text-neutral-500 text-xs px-4 my-4">
-        <a className="hover:underline" href="https://iiifimage.link/" rel="canonical">iiifimage.link</a>
+      <footer className="text-center text-neutral-600 text-xs px-4 my-4">
+        <a className="underline" href="https://iiifimage.link/" rel="canonical">iiifimage.link</a>
         {' '}is{' '}
-        <a className="hover:underline" href="https://github.com/dpb587/iiifimage.link">open source</a>
+        <a className="underline" href="https://github.com/dpb587/iiifimage.link">open source</a>
         {' '}by{' '}
-        <a className="hover:underline" href="https://dpb587.me/">danny berger</a>
+        <a className="underline" href="https://dpb587.me/">danny berger</a>
       </footer>
     </div>
   )

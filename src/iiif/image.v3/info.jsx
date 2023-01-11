@@ -49,8 +49,8 @@ function ParseInfo({ httpUrl, httpBodyJson }) {
   id.rootFeatures = resolveFeatureSet(builtinFeatures, httpBodyJson['profile'], httpBodyJson['extraFeatures'] || [])
   
   id.uiFeatureFlags = Object.fromEntries(id.rootFeatures.map(v => [v.name, v.supported]))
-  id.uiQualities = resolveFeatureSet(builtinQualities, httpBodyJson['profile'], httpBodyJson['extraQualities'] || []).filter(v => v.supported)
-  id.uiFormats = resolveFeatureSet(builtinFormats, httpBodyJson['profile'], httpBodyJson['extraFormats'] || []).filter(v => v.supported)
+  id.uiQualities = resolveFeatureSet(builtinQualities, httpBodyJson['profile'], httpBodyJson['extraQualities'] || []).filter(v => v.supported).map(v => v.name)
+  id.uiFormats = resolveFeatureSet(builtinFormats, httpBodyJson['profile'], httpBodyJson['extraFormats'] || []).filter(v => v.supported).map(v => v.name)
   id.uiFormatsPreferred = httpBodyJson['preferredFormats'] || []
 
   if (httpBodyJson['rights']) {
@@ -103,6 +103,30 @@ function ParseInfo({ httpUrl, httpBodyJson }) {
       label: 'Tiles',
       value: <span>{tiles.width}&times;{tiles.height || tiles.width} ({tiles.scaleFactors.join('/')})</span>,
     })))
+  }
+
+  if (httpBodyJson['maxWidth']) {
+    id.uiMaxWidth = httpBodyJson['maxWidth']
+    id.uiTerms.push({
+      label: 'Maximum',
+      value: `Width (${httpBodyJson['maxWidth']})`,
+    })
+  }
+
+  if (httpBodyJson['maxHeight']) {
+    id.uiMaxHeight = httpBodyJson['maxHeight']
+    id.uiTerms.push({
+      label: 'Maximum',
+      value: `Height (${httpBodyJson['maxHeight']})`,
+    })
+  }
+
+  if (httpBodyJson['maxArea']) {
+    id.uiMaxArea = httpBodyJson['maxArea']
+    id.uiTerms.push({
+      label: 'Maximum',
+      value: `Area (${httpBodyJson['maxArea']})`,
+    })
   }
 
   return id
