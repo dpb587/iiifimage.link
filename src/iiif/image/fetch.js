@@ -22,6 +22,10 @@ function fetchInfo(url) {
     // Accept: 'application/ld+json;profile=http://iiif.io/api/image/3/context.json, application/ld+json, application/json',
   };
 
+  const ir = new InfoResponse();
+  ir.httpUrl = requestUrl;
+  ir.requestHeaders = normHeaders(Object.entries(requestHeaders));
+
   const tsStarted = new Date().getTime();
 
   return fetch(requestUrl, {
@@ -30,9 +34,6 @@ function fetchInfo(url) {
     .then((res) => {
       const duration = new Date().getTime() - tsStarted;
 
-      const ir = new InfoResponse();
-      ir.httpUrl = requestUrl;
-      ir.requestHeaders = normHeaders(Object.entries(requestHeaders));
       ir.httpStatus = res.status;
       ir.httpStatusText = res.statusText;
       ir.httpDuration = duration;
@@ -49,7 +50,7 @@ function fetchInfo(url) {
           ir.errors.push({
             message: "Invalid Response (JSON Parse Error)",
             detail: err.message,
-            hints: ["Double check the URL to make sure it represents an image with an available info.json resource."],
+            hints: ["Review the link to make sure it represents an image with an available info.json resource."],
           });
 
           return ir;
@@ -71,12 +72,12 @@ function fetchInfo(url) {
             {
               message: "Unexpected Response",
               detail: `HTTP ${ir.httpStatus}${ir.httpStatusText ? ` ${ir.httpStatusText}` : ""}`,
-              hints: ["Double check the URL to make sure it represents an image with an available info.json resource."],
+              hints: ["Review the link to make sure it represents an image with an available info.json resource."],
             },
           ];
         } else if (ir.httpStatus == 401 || ir.httpStatus == 403) {
           ir.errors.push({
-            message: "Authentication Unsupported",
+            message: "Authentication Required",
             hints: [
               "This may be a valid image, but it requires authentication and those workflows are not currently supported here.",
             ],
@@ -85,14 +86,14 @@ function fetchInfo(url) {
           ir.errors.push({
             message: "IIIF Image Not Detected",
             hints: [
-              "Double check the URL to make sure it represents an image with an available info.json resource.",
-              "If the URL is correct and this is a parsing bug, please feel free to report an issue through links from the footer.",
+              "Review the link to make sure it represents an image with an available info.json resource.",
+              "If the link is correct and this is a parsing bug, please feel free to report an issue through links from the footer.",
             ],
           });
         }
       } else if (ir.httpStatus == 401 || ir.httpStatus == 403) {
         ir.errors.push({
-          message: "Authentication Supported",
+          message: "Authentication Required",
           hints: [
             "Please note that authentication workflows are not currently supported here and image information may be incomplete.",
           ],
@@ -103,6 +104,19 @@ function fetchInfo(url) {
         http: ir,
         info: id,
       };
+    }).catch((err) => {
+      ir.errors.push({
+        message: "Connection Failed",
+        detail: err.message,
+        hints: [
+          "Review the link to make sure the server is accessible.",
+          "Check the browser's Developer Tools for additional technical details.",
+        ],
+      });
+
+      return {
+        http: ir,
+      }
     });
 }
 

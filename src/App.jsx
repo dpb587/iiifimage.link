@@ -13,6 +13,7 @@ import { fetchInfo } from "./iiif/image/fetch";
 import clsx from "clsx";
 import ImageRequestBuilder from "./components/ImageRequestBuilder";
 import WelcomeSection from "./components/WelcomeSection";
+import { parseInputUrl } from "./iiif/image/url";
 
 function groupTerms(input) {
   return Object.values(
@@ -21,6 +22,14 @@ function groupTerms(input) {
       return r;
     }, {})
   );
+}
+
+const defaultUiFlags = {
+  showFeatures: false,
+  showAllFeatures: false,
+  showHttpResponse: false,
+  inputKey: '',
+  inputImageParams: {},
 }
 
 function App() {
@@ -33,11 +42,7 @@ function App() {
   });
   const [httpResponse, setHttpResponse] = useState(null);
   const [infoDescriptor, setInfoDescriptor] = useState(null);
-  const [uiFlags, setUiFlags] = useState({
-    showFeatures: false,
-    showAllFeatures: false,
-    showHttpResponse: false,
-  });
+  const [uiFlags, setUiFlags] = useState(defaultUiFlags);
 
   const uiThumbnailRef = useRef();
 
@@ -49,6 +54,7 @@ function App() {
     setUrlInput("");
     setHttpResponse(null);
     setInfoDescriptor(null);
+    setUiFlags(defaultUiFlags);
   }
 
   function setLocation(url) {
@@ -65,7 +71,9 @@ function App() {
   }
 
   function reload(url) {
-    fetchInfo(url)
+    const [ serviceUrl, imageParams ] = parseInputUrl(url)
+
+    fetchInfo(serviceUrl)
       .then((res) => {
         setHttpResponse(res.http);
         setInfoDescriptor(res.info);
@@ -73,6 +81,8 @@ function App() {
           showFeatures: false,
           showAllFeatures: false,
           showHttpResponse: false,
+          inputKey: url,
+          inputImageParams: imageParams || {},
         });
       })
       .catch((err) => {
@@ -176,7 +186,7 @@ function App() {
                   <div key={errIdx} className="mt-1.5 pt-0.5 text-neutral-700">
                     <div className="font-medium">{err.message}</div>
                     {err.hints && (
-                      <ul>
+                      <ul className="my-2.5 ml-6 sm:ml-8 list-disc">
                         {err.hints.map((hint, hintIdx) => (
                           <li key={hintIdx}>{hint}</li>
                         ))}
@@ -337,7 +347,7 @@ function App() {
             )}
             <section className="my-4">
               <div className="px-1 sm:px-4">
-                <ImageRequestBuilder infoDescriptor={infoDescriptor} />
+                <ImageRequestBuilder key={uiFlags.inputKey} infoDescriptor={infoDescriptor} defaultData={uiFlags.inputImageParams} />
               </div>
             </section>
           </div>

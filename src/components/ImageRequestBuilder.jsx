@@ -5,19 +5,75 @@ import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
 import LoadingIcon from "../components/LoadingIcon";
 
-function ImageRequestBuilder({ infoDescriptor }) {
-  const [params, setParams] = useState({
-    region: "full",
-    regionPercent: false,
-    size: infoDescriptor.rootVersion == 2 ? "full" : 'max',
-    sizePercent: false,
-    sizeConstrain: false,
-    sizeUpscale: false,
-    rotation: "0",
-    rotationFlip: false,
-    rotationArbitrary: false,
-    quality: "default",
-    format: "jpg",
+function xywhRecalculate(infoDescriptor, xywh) {
+  const { uiImageWidth, uiImageHeight } = infoDescriptor;
+
+  return [
+    // percentRegion
+    `${Math.round((xywh.x / infoDescriptor.uiThumbnailWidth) * 10000) / 100},${
+      Math.round((xywh.y / infoDescriptor.uiThumbnailHeight) * 10000) / 100
+    },${Math.round((xywh.width / infoDescriptor.uiThumbnailWidth) * 10000) / 100},${
+      Math.round((xywh.height / infoDescriptor.uiThumbnailHeight) * 10000) / 100
+    }`,
+
+    // pixelsRegion
+    `${Math.round((xywh.x / infoDescriptor.uiThumbnailWidth) * uiImageWidth)},${Math.round(
+      (xywh.y / infoDescriptor.uiThumbnailHeight) * uiImageHeight
+    )},${Math.round((xywh.width / infoDescriptor.uiThumbnailWidth) * uiImageWidth)},${Math.round(
+      (xywh.height / infoDescriptor.uiThumbnailHeight) * uiImageHeight
+    )}`,
+  ]
+}
+
+function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
+  const [params, setParams] = useState(() => {
+    const base = {
+      region: "full",
+      regionPercent: false,
+      size: infoDescriptor.rootVersion == 2 ? "full" : 'max',
+      sizePercent: false,
+      sizeConstrain: false,
+      sizeUpscale: false,
+      rotation: "0",
+      rotationFlip: false,
+      quality: "default",
+      format: "jpg",
+
+      ...defaultData,
+      rotationArbitrary: ['0', '90', '180', '270'].indexOf(defaultData.rotation) == -1,
+    }
+
+    if (base.region.indexOf(',') > -1) {
+      try {
+        const regionFloats = base.region.split(',').map(parseFloat)
+        if (regionFloats.length != 4) {
+          throw new Error('bail')
+        }
+
+        const xywh = base.regionPercent
+          ? {
+            x: regionFloats[0] / 100 * infoDescriptor.uiThumbnailWidth,
+            y: regionFloats[1] / 100 * infoDescriptor.uiThumbnailHeight,
+            width: regionFloats[2] / 100 * infoDescriptor.uiThumbnailWidth,
+            height: regionFloats[3] / 100 * infoDescriptor.uiThumbnailHeight,
+          } : {
+            x: regionFloats[0] / infoDescriptor.uiImageWidth * infoDescriptor.uiThumbnailWidth,
+            y: regionFloats[1] / infoDescriptor.uiImageHeight * infoDescriptor.uiThumbnailHeight,
+            width: regionFloats[2] / infoDescriptor.uiImageWidth * infoDescriptor.uiThumbnailWidth,
+            height: regionFloats[3] / infoDescriptor.uiImageHeight * infoDescriptor.uiThumbnailHeight,
+          };
+
+        const [ percentRegion, pixelsRegion ] = xywhRecalculate(infoDescriptor, xywh)
+
+        base.regionEditorHintsData = xywh
+        base.regionEditorHintsPercent = percentRegion
+        base.regionEditorHintsPixels = pixelsRegion
+      } catch (e) {
+        // oh well; their selection gets reset if they edit, though
+      }
+    }
+
+    return base
   });
   const [uiFlags, setUiFlags] = useState({
     editor: null,
@@ -27,18 +83,7 @@ function ImageRequestBuilder({ infoDescriptor }) {
 
   function onCrop(e) {
     setParams((params) => {
-      const { uiImageWidth, uiImageHeight } = infoDescriptor;
-
-      const percentRegion = `${Math.round((e.detail.x / infoDescriptor.uiThumbnailWidth) * 10000) / 100},${
-        Math.round((e.detail.y / infoDescriptor.uiThumbnailHeight) * 10000) / 100
-      },${Math.round((e.detail.width / infoDescriptor.uiThumbnailWidth) * 10000) / 100},${
-        Math.round((e.detail.height / infoDescriptor.uiThumbnailHeight) * 10000) / 100
-      }`;
-      const pixelsRegion = `${Math.round((e.detail.x / infoDescriptor.uiThumbnailWidth) * uiImageWidth)},${Math.round(
-        (e.detail.y / infoDescriptor.uiThumbnailHeight) * uiImageHeight
-      )},${Math.round((e.detail.width / infoDescriptor.uiThumbnailWidth) * uiImageWidth)},${Math.round(
-        (e.detail.height / infoDescriptor.uiThumbnailHeight) * uiImageHeight
-      )}`;
+      const [ percentRegion, pixelsRegion ] = xywhRecalculate(infoDescriptor, e.detail)
       const region = params.regionPercent ? percentRegion : pixelsRegion;
 
       if (params.region == region) return params;
