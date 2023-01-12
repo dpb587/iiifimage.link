@@ -5,6 +5,8 @@ import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
 import LoadingIcon from "../components/LoadingIcon";
 
+// TODO refactor much of the copy/paste form layouts
+
 function xywhRecalculate(infoDescriptor, xywh) {
   const { uiImageWidth, uiImageHeight } = infoDescriptor;
 
@@ -806,7 +808,9 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
                   <div>
                     <div>
                       <label className="text-base font-medium text-neutral-900">Format</label>{" "}
-                      <span className="text-neutral-700">(* = preferred)</span>
+                      {infoDescriptor.uiFormatsPreferred.length > 0 && (
+                        <span className="text-neutral-700">(* = preferred)</span>
+                      )}
                     </div>
                     <div className="mt-2.5">
                       <div className="space-y-4 sm:flex sm:items-center sm:space-y-0 sm:space-x-10">
@@ -825,7 +829,7 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
                               className="ml-3 block text-sm font-medium text-neutral-700"
                             >
                               {format}
-                              {(infoDescriptor.uiFormatsPreferred || []).indexOf(format) > -1 && "*"}
+                              {infoDescriptor.uiFormatsPreferred.indexOf(format) > -1 && "*"}
                             </label>
                           </div>
                         ))}
@@ -837,23 +841,23 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
             </div>
           </div>
         )}
-      </div>
-      {errors.length > 0 && (
-        <div className="-mt-1 rounded-b-md border border-t border-red-900 bg-neutral-50 text-sm font-medium shadow">
-          <div className="relative flex py-2 text-red-900">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pr-2" title={infoDescriptor.rootId}>
-              <ExclamationTriangleIcon className="h-4 w-4" />
-            </div>
-            <div className="flex w-full pl-9 pr-20">
-              <ul>
-                {errors.map((err, errIdx) => (
-                  <li key={errIdx}>{err}</li>
-                ))}
-              </ul>
+        {errors.length > 0 && (
+          <div className="-mx-px -mb-px rounded-b-md border border-red-900 bg-neutral-50 text-sm font-medium shadow">
+            <div className="relative flex py-2 text-red-900">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pr-2" title={infoDescriptor.rootId}>
+                <ExclamationTriangleIcon className="h-4 w-4" />
+              </div>
+              <div className="flex w-full pl-9 pr-20">
+                <ul>
+                  {errors.map((err, errIdx) => (
+                    <li key={errIdx}>{err}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
