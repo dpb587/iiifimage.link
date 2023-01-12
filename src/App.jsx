@@ -133,7 +133,7 @@ function App() {
   }, [window.location.hash]);
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-5xl">
       <header className="mb-4 mt-12 px-4 text-center">
         <h1 className="text-xl font-light">
           <span className="font-medium">IIIF Image Inspector</span>
@@ -167,7 +167,7 @@ function App() {
           </div>
         </form>
       </section>
-      <main className="overflow-hidden bg-white shadow-md md:rounded-md">
+      <main className="overflow-hidden bg-white shadow-md lg:rounded-md">
         {!httpResponse && !infoDescriptor && <WelcomeSection setLocation={setLocation} />}
         {httpResponse && httpResponse.errors && httpResponse.errors.length > 0 && (
           <section className="my-2 sm:my-5">
