@@ -104,7 +104,8 @@ function fetchInfo(url) {
         http: ir,
         info: id,
       };
-    }).catch((err) => {
+    })
+    .catch((err) => {
       ir.errors.push({
         message: "Connection Failed",
         detail: err.message,
@@ -116,7 +117,7 @@ function fetchInfo(url) {
 
       return {
         http: ir,
-      }
+      };
     });
 }
 

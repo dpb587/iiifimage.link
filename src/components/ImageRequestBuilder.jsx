@@ -22,7 +22,7 @@ function xywhRecalculate(infoDescriptor, xywh) {
     )},${Math.round((xywh.width / infoDescriptor.uiThumbnailWidth) * uiImageWidth)},${Math.round(
       (xywh.height / infoDescriptor.uiThumbnailHeight) * uiImageHeight
     )}`,
-  ]
+  ];
 }
 
 function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
@@ -30,7 +30,7 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
     const base = {
       region: "full",
       regionPercent: false,
-      size: infoDescriptor.rootVersion == 2 ? "full" : 'max',
+      size: infoDescriptor.rootVersion == 2 ? "full" : "max",
       sizePercent: false,
       sizeConstrain: false,
       sizeUpscale: false,
@@ -40,40 +40,41 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
       format: "jpg",
 
       ...defaultData,
-      rotationArbitrary: ['0', '90', '180', '270'].indexOf(defaultData.rotation) == -1,
-    }
+      rotationArbitrary: ["0", "90", "180", "270"].indexOf(defaultData.rotation) == -1,
+    };
 
-    if (base.region.indexOf(',') > -1) {
+    if (base.region.indexOf(",") > -1) {
       try {
-        const regionFloats = base.region.split(',').map(parseFloat)
+        const regionFloats = base.region.split(",").map(parseFloat);
         if (regionFloats.length != 4) {
-          throw new Error('bail')
+          throw new Error("bail");
         }
 
         const xywh = base.regionPercent
           ? {
-            x: regionFloats[0] / 100 * infoDescriptor.uiThumbnailWidth,
-            y: regionFloats[1] / 100 * infoDescriptor.uiThumbnailHeight,
-            width: regionFloats[2] / 100 * infoDescriptor.uiThumbnailWidth,
-            height: regionFloats[3] / 100 * infoDescriptor.uiThumbnailHeight,
-          } : {
-            x: regionFloats[0] / infoDescriptor.uiImageWidth * infoDescriptor.uiThumbnailWidth,
-            y: regionFloats[1] / infoDescriptor.uiImageHeight * infoDescriptor.uiThumbnailHeight,
-            width: regionFloats[2] / infoDescriptor.uiImageWidth * infoDescriptor.uiThumbnailWidth,
-            height: regionFloats[3] / infoDescriptor.uiImageHeight * infoDescriptor.uiThumbnailHeight,
-          };
+              x: (regionFloats[0] / 100) * infoDescriptor.uiThumbnailWidth,
+              y: (regionFloats[1] / 100) * infoDescriptor.uiThumbnailHeight,
+              width: (regionFloats[2] / 100) * infoDescriptor.uiThumbnailWidth,
+              height: (regionFloats[3] / 100) * infoDescriptor.uiThumbnailHeight,
+            }
+          : {
+              x: (regionFloats[0] / infoDescriptor.uiImageWidth) * infoDescriptor.uiThumbnailWidth,
+              y: (regionFloats[1] / infoDescriptor.uiImageHeight) * infoDescriptor.uiThumbnailHeight,
+              width: (regionFloats[2] / infoDescriptor.uiImageWidth) * infoDescriptor.uiThumbnailWidth,
+              height: (regionFloats[3] / infoDescriptor.uiImageHeight) * infoDescriptor.uiThumbnailHeight,
+            };
 
-        const [ percentRegion, pixelsRegion ] = xywhRecalculate(infoDescriptor, xywh)
+        const [percentRegion, pixelsRegion] = xywhRecalculate(infoDescriptor, xywh);
 
-        base.regionEditorHintsData = xywh
-        base.regionEditorHintsPercent = percentRegion
-        base.regionEditorHintsPixels = pixelsRegion
+        base.regionEditorHintsData = xywh;
+        base.regionEditorHintsPercent = percentRegion;
+        base.regionEditorHintsPixels = pixelsRegion;
       } catch (e) {
         // oh well; their selection gets reset if they edit, though
       }
     }
 
-    return base
+    return base;
   });
   const [uiFlags, setUiFlags] = useState({
     editor: null,
@@ -83,7 +84,7 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
 
   function onCrop(e) {
     setParams((params) => {
-      const [ percentRegion, pixelsRegion ] = xywhRecalculate(infoDescriptor, e.detail)
+      const [percentRegion, pixelsRegion] = xywhRecalculate(infoDescriptor, e.detail);
       const region = params.regionPercent ? percentRegion : pixelsRegion;
 
       if (params.region == region) return params;
@@ -125,7 +126,7 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
 
   // TODO migrate full lib validation logic
 
-  if (!params.sizePercent && params.size != "max" && params.size != 'full') {
+  if (!params.sizePercent && params.size != "max" && params.size != "full") {
     const [w, h] = params.size.split(",", 2);
     const wInt = parseInt(w);
     const hInt = parseInt(h);
@@ -144,9 +145,7 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
       <button
         type="button"
         className="inline-flex items-center rounded-sm border border-transparent bg-neutral-100 px-2.5 py-1.5 text-xs font-medium uppercase text-neutral-800 hover:bg-neutral-200 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 active:bg-neutral-300 active:text-neutral-900"
-        onClick={() =>
-          navigator.clipboard.writeText(`${infoDescriptor.rootId}/${configuredImageSlugs.join("/")}`)
-        }
+        onClick={() => navigator.clipboard.writeText(`${infoDescriptor.rootId}/${configuredImageSlugs.join("/")}`)}
       >
         Copy
       </button>
@@ -158,7 +157,7 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
         Open
       </a>
     </Fragment>
-  )
+  );
 
   const AllowUpscalingInputGroup = () => (
     <div className="relative flex items-start">
@@ -169,24 +168,21 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
           name="size-upscale"
           type="checkbox"
           checked={params.sizeUpscale}
-          onChange={() =>
-            setParams((params) => ({ ...params, sizeUpscale: !params.sizeUpscale }))
-          }
+          onChange={() => setParams((params) => ({ ...params, sizeUpscale: !params.sizeUpscale }))}
           className="h-4 w-4 rounded border-neutral-300 text-neutral-600 focus:ring-neutral-500"
         />
       </div>
       <div className="ml-3 text-sm">
         <label htmlFor="size-upscale" className="text-neutral-700">
-          <span className="font-medium">Allow Upscaling</span> when size is greater than the
-          region.
+          <span className="font-medium">Allow Upscaling</span> when size is greater than the region.
         </label>
       </div>
     </div>
-  )
+  );
 
   return (
     <div>
-      <div className="flex items-center sm:hidden px-2 py-2.5">
+      <div className="flex items-center px-2 py-2.5 sm:hidden">
         <div className="flex-grow font-medium">Image Parameters</div>
         <div className="space-x-1.5">
           <ActionButtons />
@@ -194,13 +190,16 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
       </div>
       <div className="rounded-md border border-neutral-300 bg-white shadow-sm">
         <div className="relative flex">
-          <div className="hidden absolute inset-y-0 left-0 sm:flex items-center pl-3 pr-2" title={infoDescriptor.rootId}>
+          <div
+            className="absolute inset-y-0 left-0 hidden items-center pl-3 pr-2 sm:flex"
+            title={infoDescriptor.rootId}
+          >
             <PhotoIcon className="h-4 w-4 text-neutral-500" />
           </div>
-          <div className="flex w-full px-1 sm:pl-9 sm:pr-20 text-neutral-800 overflow-x-auto">
-            <div className="hidden sm:block py-2 px-0.5 text-neutral-400">/</div>
+          <div className="flex w-full overflow-x-auto px-1 text-neutral-800 sm:pl-9 sm:pr-20">
+            <div className="hidden py-2 px-0.5 text-neutral-400 sm:block">/</div>
             <button
-              className="group relative px-1 sm:px-2 py-2 tracking-wide"
+              className="group relative px-1 py-2 tracking-wide sm:px-2"
               title="{region}"
               onClick={() =>
                 setUiFlags((uiFlags) => ({ ...uiFlags, editor: uiFlags.editor == "region" ? null : "region" }))
@@ -216,7 +215,7 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
             </button>
             <div className="py-2 px-0.5 text-neutral-400">/</div>
             <button
-              className="group relative px-1 sm:px-2 py-2 tracking-wide"
+              className="group relative px-1 py-2 tracking-wide sm:px-2"
               title="{size}"
               onClick={() =>
                 setUiFlags((uiFlags) => ({ ...uiFlags, editor: uiFlags.editor == "size" ? null : "size" }))
@@ -232,7 +231,7 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
             </button>
             <div className="py-2 px-0.5 text-neutral-400">/</div>
             <button
-              className="group relative px-1 sm:px-2 py-2 tracking-wide"
+              className="group relative px-1 py-2 tracking-wide sm:px-2"
               title="{rotation}"
               onClick={() =>
                 setUiFlags((uiFlags) => ({ ...uiFlags, editor: uiFlags.editor == "rotation" ? null : "rotation" }))
@@ -248,7 +247,7 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
             </button>
             <div className="py-2 px-0.5 text-neutral-400">/</div>
             <button
-              className="group relative px-1 sm:px-2 py-2 tracking-wide"
+              className="group relative px-1 py-2 tracking-wide sm:px-2"
               title="{quality}.{format}"
               onClick={() =>
                 setUiFlags((uiFlags) => ({ ...uiFlags, editor: uiFlags.editor == "file" ? null : "file" }))
@@ -263,7 +262,7 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
               />
             </button>
           </div>
-          <div className="hidden sm:flex absolute inset-y-1.5 right-1.5 -mr-px items-center space-x-1.5">
+          <div className="absolute inset-y-1.5 right-1.5 -mr-px hidden items-center space-x-1.5 sm:flex">
             <ActionButtons />
           </div>
         </div>
@@ -304,10 +303,7 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
                                 setParams((params) => ({ ...params, region: "square", regionPercent: false }))
                               }
                             />
-                            <label
-                              htmlFor="region-square"
-                              className="ml-3 block text-sm font-medium text-neutral-700"
-                            >
+                            <label htmlFor="region-square" className="ml-3 block text-sm font-medium text-neutral-700">
                               Square
                             </label>
                           </div>
@@ -353,10 +349,7 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
                                 }))
                               }
                             />
-                            <label
-                              htmlFor="region-pixels"
-                              className="ml-3 block text-sm font-medium text-neutral-700"
-                            >
+                            <label htmlFor="region-pixels" className="ml-3 block text-sm font-medium text-neutral-700">
                               Pixels
                             </label>
                           </div>
@@ -473,7 +466,9 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
                               onChange={() =>
                                 setParams((params) => ({
                                   ...params,
-                                  size: `${infoDescriptor.uiMaxWidth ? Math.min(512, infoDescriptor.uiMaxWidth) : 512},${infoDescriptor.uiMaxHeight ? Math.min(512, infoDescriptor.uiMaxHeight) : 512}`,
+                                  size: `${
+                                    infoDescriptor.uiMaxWidth ? Math.min(512, infoDescriptor.uiMaxWidth) : 512
+                                  },${infoDescriptor.uiMaxHeight ? Math.min(512, infoDescriptor.uiMaxHeight) : 512}`,
                                   sizeConstrain: false,
                                   sizePercent: false,
                                 }))
@@ -522,7 +517,7 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
                           {(infoDescriptor.uiFeatureFlags.sizeByW ||
                             infoDescriptor.uiFeatureFlags.sizeByH ||
                             infoDescriptor.uiFeatureFlags.sizeByWh) && (
-                            <div className="grid grid-cols-4 sm:grid-cols-6 gap-4">
+                            <div className="grid grid-cols-4 gap-4 sm:grid-cols-6">
                               <div className="col-span-2">
                                 <label htmlFor="size-width" className="block text-sm font-medium text-neutral-700">
                                   Width
@@ -578,9 +573,7 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
                           )}
                           <div>
                             <div className="space-y-2.5">
-                              {infoDescriptor.uiFeatureFlags.sizeUpscaling && (
-                                <AllowUpscalingInputGroup />
-                              )}
+                              {infoDescriptor.uiFeatureFlags.sizeUpscaling && <AllowUpscalingInputGroup />}
                               {infoDescriptor.uiFeatureFlags.sizeByConfinedWh && (
                                 <div className="relative flex items-start">
                                   <div className="flex h-5 items-center">
@@ -629,9 +622,7 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
                               </div>
                             </div>
                           </div>
-                          {infoDescriptor.uiFeatureFlags.sizeUpscaling && (
-                            <AllowUpscalingInputGroup />
-                          )}
+                          {infoDescriptor.uiFeatureFlags.sizeUpscaling && <AllowUpscalingInputGroup />}
                         </>
                       )}
                     </div>
@@ -673,10 +664,7 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
                                   setParams((params) => ({ ...params, rotation: "90", rotationArbitrary: false }))
                                 }
                               />
-                              <label
-                                htmlFor="rotation-90"
-                                className="ml-3 block text-sm font-medium text-neutral-700"
-                              >
+                              <label htmlFor="rotation-90" className="ml-3 block text-sm font-medium text-neutral-700">
                                 90&#xb0;
                               </label>
                             </div>
@@ -692,10 +680,7 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
                                   setParams((params) => ({ ...params, rotation: "180", rotationArbitrary: false }))
                                 }
                               />
-                              <label
-                                htmlFor="rotation-180"
-                                className="ml-3 block text-sm font-medium text-neutral-700"
-                              >
+                              <label htmlFor="rotation-180" className="ml-3 block text-sm font-medium text-neutral-700">
                                 180&#xb0;
                               </label>
                             </div>
@@ -711,10 +696,7 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
                                   setParams((params) => ({ ...params, rotation: "270", rotationArbitrary: false }))
                                 }
                               />
-                              <label
-                                htmlFor="rotation-270"
-                                className="ml-3 block text-sm font-medium text-neutral-700"
-                              >
+                              <label htmlFor="rotation-270" className="ml-3 block text-sm font-medium text-neutral-700">
                                 270&#xb0;
                               </label>
                             </div>

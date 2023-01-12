@@ -28,9 +28,9 @@ const defaultUiFlags = {
   showFeatures: false,
   showAllFeatures: false,
   showHttpResponse: false,
-  inputKey: '',
+  inputKey: "",
   inputImageParams: {},
-}
+};
 
 function App() {
   const [urlInput, setUrlInput] = useState(() => {
@@ -71,7 +71,7 @@ function App() {
   }
 
   function reload(url) {
-    const [ serviceUrl, imageParams ] = parseInputUrl(url)
+    const [serviceUrl, imageParams] = parseInputUrl(url);
 
     fetchInfo(serviceUrl)
       .then((res) => {
@@ -97,7 +97,7 @@ function App() {
       return reset(true);
     }
 
-    setLocation(urlInput)
+    setLocation(urlInput);
   }
 
   function doClick(e) {
@@ -149,7 +149,7 @@ function App() {
               <input
                 type="url"
                 name="url"
-                className="block w-full rounded-md border-neutral-300 pl-9 pr-18 focus:border-neutral-500 focus:ring-neutral-500"
+                className="pr-18 block w-full rounded-md border-neutral-300 pl-9 focus:border-neutral-500 focus:ring-neutral-500"
                 placeholder="Paste a link to an IIIF Image&hellip;"
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
@@ -167,14 +167,12 @@ function App() {
           </div>
         </form>
       </section>
-      <main className="overflow-hidden md:rounded-md bg-white shadow-md">
-        {!httpResponse && !infoDescriptor && (
-          <WelcomeSection setLocation={setLocation} />
-        )}
+      <main className="overflow-hidden bg-white shadow-md md:rounded-md">
+        {!httpResponse && !infoDescriptor && <WelcomeSection setLocation={setLocation} />}
         {httpResponse && httpResponse.errors && httpResponse.errors.length > 0 && (
           <section className="my-2 sm:my-5">
             <div className="flex px-3 sm:px-4">
-              <div className="hidden sm:block relative z-0 -mt-1 mr-3 px-2 pt-1.5">
+              <div className="relative z-0 -mt-1 mr-3 hidden px-2 pt-1.5 sm:block">
                 <div className="z-10 -m-px rounded-sm border border-red-900 bg-red-800 p-1 shadow-sm">
                   <ExclamationCircleIcon className="h-4 w-4 text-neutral-50" />
                 </div>
@@ -186,7 +184,7 @@ function App() {
                   <div key={errIdx} className="mt-1.5 pt-0.5 text-neutral-700">
                     <div className="font-medium">{err.message}</div>
                     {err.hints && (
-                      <ul className="my-2.5 ml-6 sm:ml-8 list-disc">
+                      <ul className="my-2.5 ml-6 list-disc sm:ml-8">
                         {err.hints.map((hint, hintIdx) => (
                           <li key={hintIdx}>{hint}</li>
                         ))}
@@ -204,10 +202,10 @@ function App() {
           </section>
         )}
         {infoDescriptor && (
-          <div className="my-3 sm:my-4 space-y-6">
+          <div className="my-3 space-y-6 sm:my-4">
             <section className="my-2 sm:my-5">
               <div className="flex px-3 sm:px-4">
-                <div className="hidden sm:block relative z-0 -mt-1 mr-3 px-2 pt-1.5">
+                <div className="relative z-0 -mt-1 mr-3 hidden px-2 pt-1.5 sm:block">
                   <div className="z-10 -m-px rounded-sm border border-neutral-300 bg-white p-1 shadow-sm">
                     <InformationCircleIcon className="h-4 w-4 text-neutral-500" />
                   </div>
@@ -249,14 +247,14 @@ function App() {
                   <div className="mt-3 sm:flex sm:space-x-3">
                     <div className="flex-0">
                       <a
-                        className="-mx-3 sm:-m-px block sm:border border-neutral-300 sm:p-0.5 text-center"
+                        className="-mx-3 block border-neutral-300 text-center sm:-m-px sm:border sm:p-0.5"
                         href={infoDescriptor.uiThumbnailUrl}
                         target="_blank"
                       >
                         <img
                           key={infoDescriptor.uiThumbnailUrl}
                           ref={uiThumbnailRef}
-                          className="w-full h-auto sm:w-32"
+                          className="h-auto w-full sm:w-32"
                           height={infoDescriptor.uiThumbnailHeight}
                           src={infoDescriptor.uiThumbnailUrl}
                           width={infoDescriptor.uiThumbnailWidth}
@@ -287,7 +285,7 @@ function App() {
             {uiFlags.showFeatures && (
               <section className="my-2 sm:my-5">
                 <div className="flex px-3 sm:px-4">
-                  <div className="hidden sm:block relative z-0 -mt-1 mr-3 px-2 pt-1.5">
+                  <div className="relative z-0 -mt-1 mr-3 hidden px-2 pt-1.5 sm:block">
                     <div className="z-10 -m-px rounded-sm border border-neutral-300 bg-white p-1 shadow-sm">
                       <SparklesIcon className="h-4 w-4 text-neutral-500" />
                     </div>
@@ -347,7 +345,11 @@ function App() {
             )}
             <section className="my-4">
               <div className="px-1 sm:px-4">
-                <ImageRequestBuilder key={uiFlags.inputKey} infoDescriptor={infoDescriptor} defaultData={uiFlags.inputImageParams} />
+                <ImageRequestBuilder
+                  key={uiFlags.inputKey}
+                  infoDescriptor={infoDescriptor}
+                  defaultData={uiFlags.inputImageParams}
+                />
               </div>
             </section>
           </div>
@@ -378,8 +380,8 @@ function App() {
               )}
             </button>
             {uiFlags.showHttpResponse && (
-              <div className="p-2 whitespace-pre bg-neutral-900 font-mono text-sm text-neutral-200">
-                <div className="px-0.5 space-y-2 overflow-x-auto">
+              <div className="whitespace-pre bg-neutral-900 p-2 font-mono text-sm text-neutral-200">
+                <div className="space-y-2 overflow-x-auto px-0.5">
                   <div className="flex text-neutral-400">
                     GET{" "}
                     <span className="font-bold">

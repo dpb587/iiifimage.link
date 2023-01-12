@@ -14,7 +14,8 @@ const examples = [
     orgName: "UCD Digital Library",
   },
   {
-    imageUrl: "https://tile.loc.gov/image-services/iiif/service:music:musbaseball:musbaseball-100028:musbaseball-100028.0001",
+    imageUrl:
+      "https://tile.loc.gov/image-services/iiif/service:music:musbaseball:musbaseball-100028:musbaseball-100028.0001",
     imageName: "Music of Over the fence is out",
     orgUrl: "https://www.loc.gov/resource/musbaseball.100028.0/",
     orgName: "Library of Congress",
@@ -36,7 +37,7 @@ function WelcomeSection({ setLocation }) {
   return (
     <section className="my-2 sm:my-5">
       <div className="flex px-3 sm:px-4">
-        <div className="hidden sm:block relative z-0 -mt-1 mr-3 px-2 pt-1.5">
+        <div className="relative z-0 -mt-1 mr-3 hidden px-2 pt-1.5 sm:block">
           <div className="z-10 -m-px rounded-sm border border-neutral-300 bg-white p-1 shadow-sm">
             <LifebuoyIcon className="h-4 w-4 text-neutral-500" />
           </div>
@@ -46,26 +47,17 @@ function WelcomeSection({ setLocation }) {
           <div className="text-lg font-medium">Links may be an image service, info.json, or image file URL.</div>
           <div className="mt-1.5 pt-0.5 leading-7 text-neutral-800">
             <p>
-              Hello! This is a small tool to inspect metadata about IIIF images and demonstrate how their image
-              file URLs may be constructed. Here are a few examples to try it out&hellip;
+              Hello! This is a small tool to inspect metadata about IIIF images and demonstrate how their image file
+              URLs may be constructed. Here are a few examples to try it out&hellip;
             </p>
-            <ul className="my-2.5 ml-6 sm:ml-8 list-disc">
+            <ul className="my-2.5 ml-6 list-disc sm:ml-8">
               {examples.map((example, exampleIdx) => (
                 <li key={exampleIdx}>
-                  <a
-                    className="font-medium underline"
-                    href={example.imageUrl}
-                    target="_blank"
-                    onClick={doClick}
-                  >
+                  <a className="font-medium underline" href={example.imageUrl} target="_blank" onClick={doClick}>
                     {example.imageName}
                   </a>{" "}
                   from{" "}
-                  <a
-                    className="underline"
-                    href={example.orgUrl}
-                    target="_blank"
-                  >
+                  <a className="underline" href={example.orgUrl} target="_blank">
                     {example.orgName}
                   </a>
                 </li>
@@ -90,7 +82,7 @@ function WelcomeSection({ setLocation }) {
         </div>
       </div>
     </section>
-  )
+  );
 }
 
-export default WelcomeSection
+export default WelcomeSection;

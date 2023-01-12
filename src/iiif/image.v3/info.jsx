@@ -103,7 +103,7 @@ function ParseInfo({ httpUrl, httpBodyJson }) {
     ),
   });
 
-  const formatPreferred = id.uiFormatsPreferred[0] || 'jpg'
+  const formatPreferred = id.uiFormatsPreferred[0] || "jpg";
 
   id.uiThumbnailWidth = 512;
   id.uiThumbnailHeight = Math.round((512 / id.uiImageWidth) * id.uiImageHeight);
