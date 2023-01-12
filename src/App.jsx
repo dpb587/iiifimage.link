@@ -1,15 +1,10 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import {
-  ArrowTopRightOnSquareIcon,
   CheckIcon,
   ChevronRightIcon,
-  CodeBracketIcon,
-  CodeBracketSquareIcon,
   ExclamationCircleIcon,
   InformationCircleIcon,
-  LifebuoyIcon,
   LinkIcon,
-  PhotoIcon,
   SparklesIcon,
   XMarkIcon,
 } from "@heroicons/react/20/solid";
@@ -17,6 +12,7 @@ import "./App.css";
 import { fetchInfo } from "./iiif/image/fetch";
 import clsx from "clsx";
 import ImageRequestBuilder from "./components/ImageRequestBuilder";
+import WelcomeSection from "./components/WelcomeSection";
 
 function groupTerms(input) {
   return Object.values(
@@ -58,7 +54,7 @@ function App() {
   function setLocation(url) {
     if (url == "") {
       try {
-        // avoids useless `#` remaining in the url
+        // avoid useless `#` remaining in the url
         history.pushState("", document.title, window.location.pathname + window.location.search);
       } catch (e) {
         window.location.hash = "";
@@ -91,7 +87,7 @@ function App() {
       return reset(true);
     }
 
-    setLocation(urlInput);
+    setLocation(urlInput)
   }
 
   function doClick(e) {
@@ -103,11 +99,6 @@ function App() {
     }
 
     doSubmit(e);
-  }
-
-  function showExample(e, target) {
-    e.preventDefault();
-    setLocation(target);
   }
 
   function hashchange() {
@@ -148,8 +139,8 @@ function App() {
               <input
                 type="url"
                 name="url"
-                className="block w-full rounded-md border-neutral-300 pl-9 pr-20 focus:border-neutral-500 focus:ring-neutral-500"
-                placeholder="Paste any link about an IIIF Image&hellip;"
+                className="block w-full rounded-md border-neutral-300 pl-9 pr-18 focus:border-neutral-500 focus:ring-neutral-500"
+                placeholder="Paste a link to an IIIF Image&hellip;"
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
               />
@@ -166,128 +157,14 @@ function App() {
           </div>
         </form>
       </section>
-      <main className="overflow-hidden rounded-md bg-white shadow-md">
+      <main className="overflow-hidden md:rounded-md bg-white shadow-md">
         {!httpResponse && !infoDescriptor && (
-          <section className="my-5">
-            <div className="flex space-x-3 px-4 pb-0.5">
-              <div className="relative z-0 -mt-1 px-2 pt-1.5">
-                <div className="z-10 -m-px rounded-sm border border-neutral-300 bg-white p-1 shadow-sm">
-                  <LifebuoyIcon className="h-4 w-4 text-neutral-500" />
-                </div>
-                <div className="absolute top-0 -bottom-1 left-5 -z-10 -ml-px w-0.5 bg-neutral-200" />
-              </div>
-              <div className="flex-1">
-                <div className="text-lg font-medium">Links may be an image service, info.json, or image file URL.</div>
-                <div className="mt-1.5 pt-0.5 leading-7 text-neutral-800">
-                  <p>
-                    Hello! This is a small tool to inspect metadata about IIIF images and demonstrate how their image
-                    file URLs may be constructed. Here are a few examples to try it out&hellip;
-                  </p>
-                  <ul className="my-2.5 ml-8 list-disc">
-                    <li>
-                      <a
-                        className="font-medium underline"
-                        href="https://images.collections.yale.edu/iiif/2/ycba:cef381c4-9716-45e9-ac19-c8ee64808170"
-                        onClick={(e) =>
-                          showExample(
-                            e,
-                            "https://images.collections.yale.edu/iiif/2/ycba:cef381c4-9716-45e9-ac19-c8ee64808170"
-                          )
-                        }
-                      >
-                        Canvas of Cornfield at sunset
-                      </a>{" "}
-                      from{" "}
-                      <a
-                        className="underline"
-                        href="https://collections.britishart.yale.edu/catalog/tms:511"
-                        target="_blank"
-                      >
-                        Yale Center for British Art
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        className="font-medium underline"
-                        href="https://iiif.ucd.ie/loris/ivrla:434"
-                        onClick={(e) => showExample(e, "https://iiif.ucd.ie/loris/ivrla:434")}
-                      >
-                        Map of the City of Dublin
-                      </a>{" "}
-                      from{" "}
-                      <a className="underline" href="https://digital.ucd.ie/view/ivrla:431" target="_blank">
-                        UCD Digital Library
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        className="font-medium underline"
-                        href="https://tile.loc.gov/image-services/iiif/service:music:musbaseball:musbaseball-100028:musbaseball-100028.0001"
-                        onClick={(e) =>
-                          showExample(
-                            e,
-                            "https://tile.loc.gov/image-services/iiif/service:music:musbaseball:musbaseball-100028:musbaseball-100028.0001"
-                          )
-                        }
-                      >
-                        Music of Over the fence is out
-                      </a>{" "}
-                      from{" "}
-                      <a
-                        className="underline"
-                        href="https://www.loc.gov/resource/musbaseball.100028.0/"
-                        target="_blank"
-                      >
-                        Library of Congress
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        className="font-medium underline"
-                        href="https://iiif.bodleian.ox.ac.uk/iiif/image/b62bca5b-d064-4ce9-b668-40eb98edbe92"
-                        onClick={(e) =>
-                          showExample(
-                            e,
-                            "https://iiif.bodleian.ox.ac.uk/iiif/image/b62bca5b-d064-4ce9-b668-40eb98edbe92"
-                          )
-                        }
-                      >
-                        Portrait of Margaret Beaufort
-                      </a>{" "}
-                      from{" "}
-                      <a
-                        className="underline"
-                        href="https://digital.bodleian.ox.ac.uk/objects/ab96d208-a553-45cc-b622-2c2210685119/"
-                        target="_blank"
-                      >
-                        Bodleian Library
-                      </a>
-                    </li>
-                  </ul>
-                  <p>
-                    You can learn more about the IIIF APIs from{" "}
-                    <a className="font-medium underline" href="https://iiif.io/api/" target="_blank">
-                      iiif.io
-                    </a>
-                    . This tool supports{" "}
-                    <a className="font-medium underline" href="https://iiif.io/api/image/2.1/" target="_blank">
-                      Version 2
-                    </a>{" "}
-                    and{" "}
-                    <a className="font-medium underline" href="https://iiif.io/api/image/3.0/" target="_blank">
-                      Version 3
-                    </a>{" "}
-                    of the Image API, but authentication-related workflows are not currently supported.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
+          <WelcomeSection setLocation={setLocation} />
         )}
         {httpResponse && httpResponse.errors && httpResponse.errors.length > 0 && (
-          <section className="my-5">
-            <div className="flex space-x-3 px-4">
-              <div className="relative z-0 -mt-1 px-2 pt-1.5">
+          <section className="my-2 sm:my-5">
+            <div className="flex px-3 sm:px-4">
+              <div className="hidden sm:block relative z-0 -mt-1 mr-3 px-2 pt-1.5">
                 <div className="z-10 -m-px rounded-sm border border-red-900 bg-red-800 p-1 shadow-sm">
                   <ExclamationCircleIcon className="h-4 w-4 text-neutral-50" />
                 </div>
@@ -317,10 +194,10 @@ function App() {
           </section>
         )}
         {infoDescriptor && (
-          <div className="my-4 space-y-6">
-            <section className="mt-5">
-              <div className="flex space-x-3 px-4">
-                <div className="relative z-0 -mt-1 px-2 pt-1.5">
+          <div className="my-3 sm:my-4 space-y-6">
+            <section className="my-2 sm:my-5">
+              <div className="flex px-3 sm:px-4">
+                <div className="hidden sm:block relative z-0 -mt-1 mr-3 px-2 pt-1.5">
                   <div className="z-10 -m-px rounded-sm border border-neutral-300 bg-white p-1 shadow-sm">
                     <InformationCircleIcon className="h-4 w-4 text-neutral-500" />
                   </div>
@@ -329,7 +206,7 @@ function App() {
                 <div className="flex-1">
                   <div className="flex">
                     <div className="flex-1">
-                      <div className="text-lg">
+                      <div className="pt-px text-lg">
                         <a
                           className="font-medium hover:underline"
                           href={infoDescriptor.rootServiceSpecUrl}
@@ -343,7 +220,7 @@ function App() {
                         </a>
                       </div>
                     </div>
-                    <div className="pr-1.5">
+                    <div className="sm:pr-1.5">
                       <button
                         type="button"
                         className="inline-flex items-center rounded-sm border border-transparent bg-neutral-100 px-2.5 py-1.5 text-xs font-medium uppercase text-neutral-800 hover:bg-neutral-200 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 active:bg-neutral-300 active:text-neutral-900"
@@ -359,17 +236,17 @@ function App() {
                       </button>
                     </div>
                   </div>
-                  <div className="mt-1.5 flex space-x-3">
+                  <div className="mt-3 sm:flex sm:space-x-3">
                     <div className="flex-0">
                       <a
-                        className="-m-px block border border-neutral-300 p-0.5 text-center"
+                        className="-mx-3 sm:-m-px block sm:border border-neutral-300 sm:p-0.5 text-center"
                         href={infoDescriptor.uiThumbnailUrl}
                         target="_blank"
                       >
                         <img
                           key={infoDescriptor.uiThumbnailUrl}
                           ref={uiThumbnailRef}
-                          className="h-auto w-32"
+                          className="w-full h-auto sm:w-32"
                           height={infoDescriptor.uiThumbnailHeight}
                           src={infoDescriptor.uiThumbnailUrl}
                           width={infoDescriptor.uiThumbnailWidth}
@@ -377,7 +254,7 @@ function App() {
                       </a>
                     </div>
                     {infoDescriptor.uiTerms.length > 0 && (
-                      <div className="flex-1 pt-0.5">
+                      <div className="flex-1 pt-2 sm:pt-0.5">
                         <dl className="space-y-1 text-sm text-neutral-700">
                           {groupTerms(infoDescriptor.uiTerms).map((termValues) => (
                             <div key={termValues[0].label}>
@@ -398,9 +275,9 @@ function App() {
               </div>
             </section>
             {uiFlags.showFeatures && (
-              <section className="my-4">
-                <div className="flex space-x-3 px-4">
-                  <div className="relative z-0 -mt-1 px-2 pt-1.5">
+              <section className="my-2 sm:my-5">
+                <div className="flex px-3 sm:px-4">
+                  <div className="hidden sm:block relative z-0 -mt-1 mr-3 px-2 pt-1.5">
                     <div className="z-10 -m-px rounded-sm border border-neutral-300 bg-white p-1 shadow-sm">
                       <SparklesIcon className="h-4 w-4 text-neutral-500" />
                     </div>
@@ -411,7 +288,7 @@ function App() {
                       <div className="flex-1">
                         <div className="text-lg">Features</div>
                       </div>
-                      <div className="pr-1.5">
+                      <div className="sm:pr-1.5">
                         <button
                           type="button"
                           className="inline-flex items-center rounded-sm border border-transparent bg-neutral-100 px-2.5 py-1.5 text-xs font-medium uppercase text-neutral-800 hover:bg-neutral-200 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 active:bg-neutral-300 active:text-neutral-900"
@@ -458,14 +335,18 @@ function App() {
                 </div>
               </section>
             )}
-            <ImageRequestBuilder infoDescriptor={infoDescriptor} />
+            <section className="my-4">
+              <div className="px-1 sm:px-4">
+                <ImageRequestBuilder infoDescriptor={infoDescriptor} />
+              </div>
+            </section>
           </div>
         )}
         {httpResponse && (
-          <section>
+          <section className="mt-4">
             <button
               className={clsx(
-                "flex w-full items-center border-t p-1.5 text-left font-mono text-xs hover:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-neutral-500 focus:ring-offset-1",
+                "flex w-full items-center border-t px-1 py-1.5 text-left font-mono text-xs hover:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-neutral-500 focus:ring-offset-1",
                 uiFlags.showHttpResponse ? "bg-neutral-100 text-neutral-500" : "text-neutral-400 hover:bg-neutral-100"
               )}
               onClick={() => setUiFlags((uiFlags) => ({ ...uiFlags, showHttpResponse: !uiFlags.showHttpResponse }))}
@@ -473,7 +354,7 @@ function App() {
               <ChevronRightIcon
                 className={clsx("h-4 w-4 transition-transform duration-100", uiFlags.showHttpResponse && "rotate-90")}
               />
-              <span className="ml-1">info.json</span>
+              <span className="ml-0.5">info.json</span>
               <span className="mx-1"> &middot; </span>
               <span>
                 {httpResponse.httpStatus}
@@ -487,55 +368,57 @@ function App() {
               )}
             </button>
             {uiFlags.showHttpResponse && (
-              <div className="space-y-2 overflow-x-auto whitespace-pre bg-neutral-900 py-2 font-mono text-sm text-neutral-200">
-                <div className="flex px-2.5 text-neutral-400">
-                  GET{" "}
-                  <span className="font-bold">
-                    <a className="underline" href={httpResponse.httpUrl}>
-                      {httpResponse.httpUrl}
-                    </a>
-                  </span>
-                </div>
-                {httpResponse.requestHeaders.length > 0 && (
-                  <div className="px-2.5 text-neutral-400">
-                    {httpResponse.requestHeaders.map((nv, nvIdx) => (
-                      <div key={nvIdx} className="flex space-x-2">
-                        <span>&gt;</span>
-                        <pre className="whitespace-pre-wrap">
-                          <code>
-                            <span className="font-bold">{nv[0]}</span>: {nv[1]}
-                          </code>
-                        </pre>
-                      </div>
-                    ))}
+              <div className="p-2 whitespace-pre bg-neutral-900 font-mono text-sm text-neutral-200">
+                <div className="px-0.5 space-y-2 overflow-x-auto">
+                  <div className="flex text-neutral-400">
+                    GET{" "}
+                    <span className="font-bold">
+                      <a className="underline" href={httpResponse.httpUrl}>
+                        {httpResponse.httpUrl}
+                      </a>
+                    </span>
                   </div>
-                )}
-                <div className="flex px-2.5 text-neutral-400">
-                  HTTP{" "}
-                  <span className="font-bold">
-                    {httpResponse.httpStatus}
-                    {httpResponse.httpStatusText && ` ${httpResponse.httpStatusText}`}
-                  </span>
-                </div>
-                {httpResponse.httpHeaders.length > 0 && (
-                  <div className="relative px-2.5 text-neutral-400">
-                    {httpResponse.httpHeaders.map((nv, nvIdx) => (
-                      <div key={nvIdx} className="flex space-x-2">
-                        <span>&lt;</span>
-                        <pre className="whitespace-pre-wrap">
-                          <code>
-                            <span className="font-bold">{nv[0]}</span>: {nv[1]}
-                          </code>
-                        </pre>
-                      </div>
-                    ))}
+                  {httpResponse.requestHeaders.length > 0 && (
+                    <div className="px-2.5 text-neutral-400">
+                      {httpResponse.requestHeaders.map((nv, nvIdx) => (
+                        <div key={nvIdx} className="flex space-x-2">
+                          <span>&gt;</span>
+                          <pre className="whitespace-pre-wrap">
+                            <code>
+                              <span className="font-bold">{nv[0]}</span>: {nv[1]}
+                            </code>
+                          </pre>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <div className="flex text-neutral-400">
+                    HTTP{" "}
+                    <span className="font-bold">
+                      {httpResponse.httpStatus}
+                      {httpResponse.httpStatusText && ` ${httpResponse.httpStatusText}`}
+                    </span>
                   </div>
-                )}
-                {httpResponse.httpBodyJson && (
-                  <pre className="px-2.5">
-                    <code>{JSON.stringify(httpResponse.httpBodyJson, "\n", "\t")}</code>
-                  </pre>
-                )}
+                  {httpResponse.httpHeaders.length > 0 && (
+                    <div className="relative text-neutral-400">
+                      {httpResponse.httpHeaders.map((nv, nvIdx) => (
+                        <div key={nvIdx} className="flex space-x-2">
+                          <span>&lt;</span>
+                          <pre className="whitespace-pre-wrap">
+                            <code>
+                              <span className="font-bold">{nv[0]}</span>: {nv[1]}
+                            </code>
+                          </pre>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {httpResponse.httpBodyJson && (
+                    <pre>
+                      <code>{JSON.stringify(httpResponse.httpBodyJson, "\n", "\t")}</code>
+                    </pre>
+                  )}
+                </div>
               </div>
             )}
           </section>

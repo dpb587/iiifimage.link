@@ -14,6 +14,7 @@ class InfoResponse {
 
 class InfoDescriptor {
   rootId;
+  rootVersion;
   rootServiceName;
   rootServiceSpecUrl;
   rootComplianceName;

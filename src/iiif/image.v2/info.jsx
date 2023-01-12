@@ -40,6 +40,7 @@ function ParseInfo({ httpUrl, httpBodyJson }) {
 
   const id = new InfoDescriptor();
   id.rootId = new URL(httpBodyJson["@id"], httpUrl).toString();
+  id.rootVersion = 2;
   id.rootServiceName = serviceName;
   id.rootServiceSpecUrl = serviceSpecUrl;
   id.rootComplianceSpecUrl = complianceSpecUrl;
@@ -186,9 +187,11 @@ function ParseInfo({ httpUrl, httpBodyJson }) {
     ),
   });
 
+  const formatPreferred = id.uiFormatsPreferred[0] || 'jpg'
+
   id.uiThumbnailWidth = 512;
   id.uiThumbnailHeight = Math.round((512 / id.uiImageWidth) * id.uiImageHeight);
-  id.uiThumbnailUrl = `${id.rootId}/full/${id.uiThumbnailWidth},${id.uiThumbnailHeight}/0/default.jpg`;
+  id.uiThumbnailUrl = `${id.rootId}/full/${id.uiThumbnailWidth},${id.uiThumbnailHeight}/0/default.${formatPreferred}`;
 
   if (httpBodyJson["sizes"]) {
     let seekingThumbnail = true;
@@ -202,7 +205,7 @@ function ParseInfo({ httpUrl, httpBodyJson }) {
       if (seekingThumbnail && (size.width > 512 || size.height > 512)) {
         seekingThumbnail = false;
 
-        id.uiThumbnailUrl = `${id.rootId}/full/${size.width},${size.height}/0/default.jpg`;
+        id.uiThumbnailUrl = `${id.rootId}/full/${size.width},${size.height}/0/default.${formatPreferred}`;
         id.uiThumbnailHeight = size.height;
         id.uiThumbnailWidth = size.width;
       }
