@@ -79,7 +79,7 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
     return base;
   });
   const [uiFlags, setUiFlags] = useState({
-    editor: null,
+    editor: "region",
   });
 
   const regionPreviewRef = useRef();
@@ -371,6 +371,7 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
                           ref={regionPreviewRef}
                           viewMode={1}
                           data={params.regionEditorHintsData}
+                          dragMode="move"
                           checkOrientation={false}
                           autoCropArea={1}
                           rotatable={false}
