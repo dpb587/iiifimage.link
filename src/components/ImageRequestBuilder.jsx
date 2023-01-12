@@ -407,7 +407,7 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
                               }
                             />
                             <label htmlFor="size-full" className="ml-3 block text-sm font-medium text-neutral-700">
-                              Full Size
+                              Full
                             </label>
                           </div>
                         )}
@@ -495,19 +495,23 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
                         <>
                           {(infoDescriptor.uiSizesPreferred || []).length > 0 && (
                             <div>
-                              <label htmlFor="size-width" className="block text-sm font-medium text-neutral-700">
-                                Preferred Sizes
+                              <label htmlFor="size-width" className="block text-sm text-neutral-700">
+                                <span className="font-medium">Preferred Sizes</span> (with full region)
                               </label>
                               <div className="relative mt-0.5 -mb-px leading-10">
-                                {infoDescriptor.uiSizesPreferred.map((size, sizeIdx) => (
+                                {infoDescriptor.uiSizesPreferred.map((size) => (
                                   <button
                                     key={`${size.width}x${size.height}`}
                                     className="mr-2 inline-flex items-center rounded-sm border border-transparent bg-neutral-100 px-2.5 py-1.5 text-xs font-medium uppercase text-neutral-800 hover:bg-neutral-200 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 active:bg-neutral-300 active:text-neutral-900"
                                     onClick={() =>
                                       setParams((params) => ({
                                         ...params,
+                                        region: "full",
+                                        regionPercent: false,
                                         size: `${size.width},${size.height}`,
                                         sizePercent: false,
+                                        sizeConstrain: false,
+                                        sizeUpscale: false,
                                       }))
                                     }
                                   >
@@ -520,7 +524,7 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
                           {(infoDescriptor.uiFeatureFlags.sizeByW ||
                             infoDescriptor.uiFeatureFlags.sizeByH ||
                             infoDescriptor.uiFeatureFlags.sizeByWh) && (
-                            <div className="grid grid-cols-4 gap-4 sm:grid-cols-6">
+                            <div className="grid grid-cols-4 gap-4 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-8">
                               <div className="col-span-2">
                                 <label htmlFor="size-width" className="block text-sm font-medium text-neutral-700">
                                   Width

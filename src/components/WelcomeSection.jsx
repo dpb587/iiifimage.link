@@ -35,8 +35,8 @@ function WelcomeSection({ setLocation }) {
   }
 
   return (
-    <section className="my-2 sm:my-5">
-      <div className="flex px-3 sm:px-4">
+    <section className="my-3 sm:my-5">
+      <div className="flex px-4">
         <div className="relative z-0 -mt-1 mr-3 hidden px-2 pt-1.5 sm:block">
           <div className="z-10 -m-px rounded-sm border border-neutral-300 bg-white p-1 shadow-sm">
             <LifebuoyIcon className="h-4 w-4 text-neutral-500" />
@@ -44,13 +44,13 @@ function WelcomeSection({ setLocation }) {
           <div className="absolute top-0 -bottom-1 left-5 -z-10 -ml-px w-0.5 bg-neutral-200" />
         </div>
         <div className="flex-1">
-          <div className="text-lg font-medium">Links may be an image service, info.json, or image file URL.</div>
-          <div className="mt-1.5 pt-0.5 leading-7 text-neutral-800">
+          <div className="text-lg font-medium">Links may be to info.json, an image file, or a base image URL.</div>
+          <div className="mt-1.5 pt-0.5 leading-7 text-neutral-700">
             <p>
               Hello! This is a small tool to inspect metadata about IIIF images and demonstrate how their image file
               URLs may be constructed. Here are a few examples to try it out&hellip;
             </p>
-            <ul className="my-2.5 ml-6 list-disc sm:ml-8">
+            <ul className="my-2.5 ml-6 list-disc space-y-1.5 leading-6 sm:ml-8">
               {examples.map((example, exampleIdx) => (
                 <li key={exampleIdx}>
                   <a className="font-medium underline" href={example.imageUrl} target="_blank" onClick={doClick}>

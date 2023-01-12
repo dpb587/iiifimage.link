@@ -134,7 +134,7 @@ function App() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <header className="mb-4 mt-12 px-4 text-center">
+      <header className="mb-4 mt-4 px-4 text-center md:mt-12">
         <h1 className="text-xl font-light">
           <span className="font-medium">IIIF Image Inspector</span>
         </h1>
@@ -380,9 +380,9 @@ function App() {
               )}
             </button>
             {uiFlags.showHttpResponse && (
-              <div className="whitespace-pre bg-neutral-900 p-2 font-mono text-sm text-neutral-200">
+              <div className="whitespace-pre bg-neutral-900 p-2 font-mono text-sm text-neutral-400">
                 <div className="space-y-2 overflow-x-auto px-0.5">
-                  <div className="flex text-neutral-400">
+                  <div>
                     GET{" "}
                     <span className="font-bold">
                       <a className="underline" href={httpResponse.httpUrl}>
@@ -391,7 +391,7 @@ function App() {
                     </span>
                   </div>
                   {httpResponse.requestHeaders.length > 0 && (
-                    <div className="px-2.5 text-neutral-400">
+                    <div>
                       {httpResponse.requestHeaders.map((nv, nvIdx) => (
                         <div key={nvIdx} className="flex space-x-2">
                           <span>&gt;</span>
@@ -404,7 +404,7 @@ function App() {
                       ))}
                     </div>
                   )}
-                  <div className="flex text-neutral-400">
+                  <div>
                     HTTP{" "}
                     <span className="font-bold">
                       {httpResponse.httpStatus}
@@ -412,7 +412,7 @@ function App() {
                     </span>
                   </div>
                   {httpResponse.httpHeaders.length > 0 && (
-                    <div className="relative text-neutral-400">
+                    <div>
                       {httpResponse.httpHeaders.map((nv, nvIdx) => (
                         <div key={nvIdx} className="flex space-x-2">
                           <span>&lt;</span>
@@ -426,7 +426,7 @@ function App() {
                     </div>
                   )}
                   {httpResponse.httpBodyJson && (
-                    <pre>
+                    <pre className="text-neutral-200">
                       <code>{JSON.stringify(httpResponse.httpBodyJson, "\n", "\t")}</code>
                     </pre>
                   )}

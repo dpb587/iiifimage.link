@@ -179,7 +179,7 @@ function ParseInfo({ httpUrl, httpBodyJson }) {
   id.uiImageWidth = httpBodyJson["width"];
   id.uiImageHeight = httpBodyJson["height"];
   id.uiTerms.push({
-    label: "Full Size",
+    label: "Size",
     value: (
       <span>
         {id.uiImageWidth}&times;{id.uiImageHeight}
