@@ -64,7 +64,8 @@ function parseImageParams(match) {
 
   if (uiData.rotation.match(/^!/)) {
     uiData.rotationFlip = true;
-    uiData.rotation = uiData.rotation.replace(/!/, "");
+    uiData.rotation = uiData.rotation.replace(/^!/, "");
+    parseFloat(uiData.rotation); // lightweight validate
   }
 
   return uiData;

@@ -42,8 +42,9 @@ function ImageRequestBuilder({ infoDescriptor, defaultData = {} }) {
       format: "jpg",
 
       ...defaultData,
-      rotationArbitrary: ["0", "90", "180", "270"].indexOf(defaultData.rotation) == -1,
     };
+
+    base.rotationArbitrary = ["0", "90", "180", "270"].indexOf(base.rotation) == -1;
 
     if (base.region.indexOf(",") > -1) {
       try {
