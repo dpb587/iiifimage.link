@@ -1,3 +1,4 @@
+import { parseCommonImage, parseCommonSizes, parseCommonTiles } from "../image/common";
 import { InfoDescriptor, resolveFeatureSet } from "../image/info";
 import {
   builtinFeatures,
@@ -71,11 +72,7 @@ function ParseInfo({ httpUrl, httpBodyJson }) {
   if (httpBodyJson["rights"]) {
     id.uiTerms.push({
       label: "Rights",
-      value: (
-        <a className="underline" href={httpBodyJson["rights"]} target="_blank">
-          {httpBodyJson["rights"]}
-        </a>
-      ),
+      value: `<a class="underline" href=${httpBodyJson["rights"]} target="_blank">${httpBodyJson["rights"].replace(/^(https?:\/\/|)/, '')}</a>`,
     });
   }
 
@@ -83,63 +80,16 @@ function ParseInfo({ httpUrl, httpBodyJson }) {
     id.uiTerms.push(
       ...httpBodyJson["partOf"].map((partOf) => ({
         label: "Part of",
-        value: (
-          <a className="underline" href={partOf.id} target="_blank">
-            {partOf.label || partOf.type}
-          </a>
-        ),
+        value: `<a class="underline" href=${partOf.id} target="_blank">${partOf.label || partOf.type}</a>`,
       }))
     );
   }
 
-  id.uiImageWidth = httpBodyJson["width"];
-  id.uiImageHeight = httpBodyJson["height"];
-  id.uiTerms.push({
-    label: "Size",
-    value: (
-      <span>
-        {id.uiImageWidth}&times;{id.uiImageHeight}
-      </span>
-    ),
-  });
+  parseCommonImage(id, httpBodyJson)
+  parseCommonSizes(id, httpBodyJson)
+  parseCommonTiles(id, httpBodyJson)
 
-  const formatPreferred = id.uiFormatsPreferred[0] || "jpg";
-
-  id.uiThumbnailWidth = 512;
-  id.uiThumbnailHeight = Math.round((512 / id.uiImageWidth) * id.uiImageHeight);
-  id.uiThumbnailUrl = `${id.rootId}/full/${id.uiThumbnailWidth},${id.uiThumbnailHeight}/0/default.${formatPreferred}`;
-
-  if (httpBodyJson["sizes"]) {
-    let seekingThumbnail = true;
-
-    for (const size of httpBodyJson["sizes"]) {
-      id.uiSizesPreferred.push({
-        width: size.width,
-        height: size.height || size.width,
-      });
-
-      if (seekingThumbnail && (size.width > 512 || size.height > 512)) {
-        seekingThumbnail = false;
-
-        id.uiThumbnailUrl = `${id.rootId}/full/${size.width},${size.height}/0/default.${formatPreferred}`;
-        id.uiThumbnailHeight = size.height;
-        id.uiThumbnailWidth = size.width;
-      }
-    }
-  }
-
-  if (httpBodyJson["tiles"]) {
-    id.uiTerms.push(
-      ...httpBodyJson["tiles"].map((tiles) => ({
-        label: "Tiles",
-        value: (
-          <span>
-            {tiles.width}&times;{tiles.height || tiles.width} ({tiles.scaleFactors.join("/")})
-          </span>
-        ),
-      }))
-    );
-  }
+  id.configureThumbnail()
 
   if (httpBodyJson["maxWidth"]) {
     id.uiMaxWidth = httpBodyJson["maxWidth"];

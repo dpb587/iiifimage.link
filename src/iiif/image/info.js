@@ -38,6 +38,27 @@ class InfoDescriptor {
   uiQualities = [];
   uiFormats = [];
   uiFormatsPreferred = [];
+
+  configureThumbnail() {
+    const formatPreferred = this.uiFormatsPreferred[0] || "jpg";
+
+    this.uiThumbnailWidth = 512;
+    this.uiThumbnailHeight = Math.round((512 / this.uiImageWidth) * this.uiImageHeight);
+    this.uiThumbnailUrl = `${this.rootId}/full/${this.uiThumbnailWidth},${this.uiThumbnailHeight}/0/default.${formatPreferred}`;
+
+    // TODO handle level0 + max < 512
+    for (const size of this.uiSizesPreferred) {
+      if (size.width < 512 || size.height < 512) {
+        continue
+      }
+
+      this.uiThumbnailUrl = `${this.rootId}/full/${size.width},${size.height}/0/default.${formatPreferred}`;
+      this.uiThumbnailHeight = size.height;
+      this.uiThumbnailWidth = size.width;
+
+      return
+    }
+  }
 }
 
 export { InfoResponse, InfoDescriptor };

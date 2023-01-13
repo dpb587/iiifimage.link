@@ -270,7 +270,7 @@ function App() {
                               {termValues.map((termValue, termValueIdx) => (
                                 <Fragment key={termValueIdx}>
                                   {termValueIdx > 0 && ", "}
-                                  <dd className="inline">{termValue.value}</dd>
+                                  <dd className="inline" dangerouslySetInnerHTML={{__html: termValue.value}} />
                                 </Fragment>
                               ))}
                             </div>
