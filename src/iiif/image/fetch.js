@@ -58,10 +58,34 @@ function fetchInfo(url) {
     })
     .then((ir) => {
       let id = null;
+
       if (ir.errors.length == 0) {
-        id = ParseInfoV3(ir);
+        var maybeErrors = [];
+
+        try {
+          id = ParseInfoV3(ir);
+        } catch (err) {
+          maybeErrors.push({
+            message: "Parsing Error (v3)",
+            detail: err.message,
+            hints: ["This is likely caused by a bug in this tool - please feel free to report an issue through links from the footer."],
+          })
+        }
+
         if (!id) {
-          id = ParseInfoV2(ir);
+          try {
+            id = ParseInfoV2(ir);
+          } catch (err) {
+            maybeErrors.push({
+              message: "Parsing Error (v2)",
+              detail: err.message,
+              hints: ["This is likely caused by a bug in this tool - please feel free to report an issue through links from the footer."],
+            })
+          }
+        }
+
+        if (!id) {
+          ir.errors.push(...maybeErrors)
         }
       }
 

@@ -113,7 +113,7 @@ function ParseInfo({ httpUrl, httpBodyJson }) {
     let seekingThumbnail = true;
 
     for (const size of httpBodyJson["sizes"]) {
-      id.uiPreferredSizes.push({
+      id.uiSizesPreferred.push({
         width: size.width,
         height: size.height || size.width,
       });
