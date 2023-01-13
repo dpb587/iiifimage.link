@@ -240,7 +240,7 @@ function App() {
                           }))
                         }
                       >
-                        {infoDescriptor.rootFeatures.length} Features
+                        {infoDescriptor.rootFeatures.filter(v => v.supported).length} Features
                       </button>
                     </div>
                   </div>
@@ -304,7 +304,7 @@ function App() {
                             setUiFlags((uiFlags) => ({ ...uiFlags, showAllFeatures: !uiFlags.showAllFeatures }))
                           }
                         >
-                          {uiFlags.showAllFeatures ? "Hide Unsupported" : "Show All"}
+                          {uiFlags.showAllFeatures ? "All Features" : "Supported"}
                         </button>
                       </div>
                     </div>
@@ -323,7 +323,7 @@ function App() {
                                     </div>
                                   ) : (
                                     <div className="inline-flex items-center py-2">
-                                      <XMarkIcon className="h-5 w-5 text-red-900" />
+                                      <XMarkIcon className="h-5 w-5 bg-red-900 text-neutral-100" />
                                       <span className="sr-only ml-1">Not Supported</span>
                                     </div>
                                   )}
