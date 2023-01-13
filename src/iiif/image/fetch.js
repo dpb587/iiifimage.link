@@ -106,6 +106,13 @@ function fetchInfo(url) {
               "This may be a valid image, but it requires authentication and those workflows are not currently supported here.",
             ],
           });
+        } else if (ir.httpStatus >= 500) {
+          ir.errors.push({
+            message: "Server Error",
+            hints: [
+              "This may be a valid image, but something went wrong while the remote server processed the request.",
+            ],
+          });
         } else if (ir.errors.length == 0) {
           ir.errors.push({
             message: "IIIF Image Not Detected",
